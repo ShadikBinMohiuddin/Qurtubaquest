@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Social App</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b141a;
+      color: white;
+    }
+
+    header {
+      background: #202c33;
+      padding: 20px;
+      color: #25d366;
+      font-size: 27px;
+      font-weight: bold;
+    }
+
+    .search {
+      padding: 12px;
+    }
+
+    .search input {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 25px;
+      background: #202c33;
+      color: white;
+      font-size: 16px;
+    }
+
+    .chat {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      border-bottom: 1px solid #26343b;
+      cursor: pointer;
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #075e54;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+    }
+
+    .details {
+      flex: 1;
+    }
+
+    .details h3 {
+      margin: 0 0 7px;
+      font-size: 17px;
+    }
+
+    .details p {
+      margin: 0;
+      color: #aebac1;
+      font-size: 14px;
+    }
+
+    .time {
+      color: #86969e;
+      font-size: 12px;
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: #202c33;
+      padding: 15px 0;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: #d7e1e5;
+      font-size: 14px;
+    }
+
+    nav button:focus,
+    nav button:hover {
+      color: #25d366;
+    }
+
+    main {
+      padding-bottom: 75px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>My Social</header>
+
+  <div class="search">
+    <input
+      id="search"
+      type="search"
+      placeholder="Search friends..."
+      oninput="searchChats()"
+    >
+  </div>
+
+  <main id="chats">
+    <div class="chat" onclick="openChat('Rahim')">
+      <div class="avatar">R</div>
+      <div class="details">
+        <h3>Rahim</h3>
+        <p>Hi! How are you?</p>
+      </div>
+      <span class="time">10:30</span>
+    </div>
+
+    <div class="chat" onclick="openChat('Karim')">
+      <div class="avatar">K</div>
+      <div class="details">
+        <h3>Karim</h3>
+        <p>See you soon!</p>
+      </div>
+      <span class="time">09:45</span>
+    </div>
+
+    <div class="chat" onclick="openChat('Sakib')">
+      <div class="avatar">S</div>
+      <div class="details">
+        <h3>Sakib</h3>
+        <p>How is your study?</p>
+      </div>
+      <span class="time">Yesterday</span>
+    </div>
+  </main>
+
+  <nav>
+    <button onclick="showTab('Chats')">Chats</button>
+    <button onclick="showTab('Updates')">Updates</button>
+    <button onclick="showTab('Calls')">Calls</button>
+    <button onclick="showTab('Profile')">Profile</button>
+  </nav>
+
+  <script>
+    function searchChats() {
+      const query = document
+        .getElementById('search')
+        .value.toLowerCase();
+
+      document.querySelectorAll('.chat').forEach(chat => {
+        chat.style.display =
+          chat.innerText.toLowerCase().includes(query)
+            ? 'flex'
+            : 'none';
+      });
+    }
+
+    function openChat(name) {
+      alert('You selected ' + name +
+        '. Real messaging will be added next.');
+    }
+
+    function showTab(tab) {
+      alert(tab + ' feature will be added next.');
+    }
+  </script>
+</body>
+</html>
