@@ -494,108 +494,276 @@ function onIncomingCall(snap) {
   show("callBox",true); show("answer",true);
   $("answer").onclick = () => answerCall(snap.key,c);
 }
+
 function newPeer() {
   pc = new RTCPeerConnection(rtcConfig);
-  pc.ontrack = e => {
-    if (e.streams[0]) $("remoteVideo").srcObject = e.streams[0];
-  };
-  pc.onicecandidate = e => {
-    if (e.candidate && callRef) {
-      const path = callRole === "caller" ? "callerCandidates" : "calleeCandidates";
-      callRef.child(path).push(e.candidate.toJSON());
+  const peer = pc;
+  const pendingCandidates = [];
+
+  peer.ontrack = e => {
+    if (e.streams[0]) {
+      $("remoteVideo").srcObject = e.streams[0];
     }
   };
-  const remotePath = callRole === "caller" ? "calleeCandidates" : "callerCandidates";
-  callRef.child(remotePath).on("child_added", async snap => {
-    if (!pc || !snap.val()) return;
-    try { await pc.addIceCandidate(new RTCIceCandidate(snap.val())); }
-    catch(e) { console.warn(e); }
-  });
-  pc.onconnectionstatechange = () => {
-    if (pc && pc.connectionState === "connected") say("callStatus","Connected");
-    if (pc && pc.connectionState === "failed") say("callStatus","Connection failed; a TURN server may be needed.");
+
+  peer.onicecandidate = e => {
+    if (e.candidate && callRef) {
+      const path = callRole === "caller"
+        ? "callerCandidates"
+        : "calleeCandidates";
+
+      callRef.child(path).push(e.candidate.toJSON())
+        .catch(err => console.warn("ICE save error:", err));
+    }
   };
+
+  const remotePath = callRole === "caller"
+    ? "calleeCandidates"
+    : "callerCandidates";
+
+  callRef.child(remotePath).on("child_added", async snap => {
+    if (!snap.val() || pc !== peer) return;
+
+    try {
+      const candidate = new RTCIceCandidate(snap.val());
+
+      if (peer.remoteDescription) {
+        await peer.addIceCandidate(candidate);
+      } else {
+        pendingCandidates.push(candidate);
+      }
+    } catch (e) {
+      console.warn("ICE candidate error:", e);
+    }
+  });
+
+  peer.flushPendingCandidates = async () => {
+    while (pendingCandidates.length && peer.remoteDescription) {
+      const candidate = pendingCandidates.shift();
+      try {
+        await peer.addIceCandidate(candidate);
+      } catch (e) {
+        console.warn("ICE candidate error:", e);
+      }
+    }
+  };
+
+  peer.onconnectionstatechange = () => {
+    if (pc !== peer) return;
+
+    if (peer.connectionState === "connected") {
+      say("callStatus", "Connected");
+    } else if (peer.connectionState === "failed") {
+      say("callStatus",
+        "Connection failed. A TURN server may be needed.");
+    }
+  };
+
+  return peer;
 }
+
+
 async function startCall(type) {
-  if (!selected || !contacts[selected]) return;
+  if (!me || !selected || !contacts[selected]) return;
+
   try {
     await endCall(false);
+
     callType = type;
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio:true, video:type==="video"
+
+    const localStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: type === "video"
     });
-    $("localVideo").srcObject = stream;
-    $("localVideo").classList.toggle("hidden",type!=="video");
-    $("remoteVideo").classList.toggle("hidden",type!=="video");
-    callRef = db.ref("calls").push();
+    stream = localStream;
+
+    $("localVideo").srcObject = localStream;
+    $("localVideo").classList.toggle("hidden", type !== "video");
+    $("remoteVideo").srcObject = null;
+    $("remoteVideo").classList.toggle("hidden", type !== "video");
+
+    const ref = db.ref("calls").push();
+    callRef = ref;
     callRole = "caller";
-    newPeer();
-    stream.getTracks().forEach(t=>pc.addTrack(t,stream));
-    const offer = await pc.createOffer();
-    await callRef.set({
-      callerId:me.uid, receiverId:selected, type,
-      offer:{type:offer.type,sdp:offer.sdp},
-      status:"ringing", createdAt:firebase.database.ServerValue.TIMESTAMP
+
+    const peer = newPeer();
+
+    localStream.getTracks().forEach(track => {
+      peer.addTrack(track, localStream);
     });
-    await pc.setLocalDescription(offer);
-    callRef.child("answer").on("value",async snap=>{
-      if (snap.val() && pc && !pc.currentRemoteDescription) {
-        try { await pc.setRemoteDescription(new RTCSessionDescription(snap.val())); }
-        catch(e) { console.warn(e); }
+
+    const offer = await peer.createOffer();
+    await peer.setLocalDescription(offer);
+
+    await ref.set({
+      callerId: me.uid,
+      receiverId: selected,
+      type,
+      offer: {
+        type: offer.type,
+        sdp: offer.sdp
+      },
+      status: "ringing",
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+
+    ref.child("answer").on("value", async snap => {
+      if (!snap.val() || pc !== peer || peer.remoteDescription) return;
+
+      try {
+        await peer.setRemoteDescription(
+          new RTCSessionDescription(snap.val())
+        );
+        await peer.flushPendingCandidates();
+      } catch (e) {
+        console.warn("Answer error:", e);
+        say("callStatus", "Could not connect: " + err(e));
       }
     });
-    callRef.child("status").on("value",snap=>{
-      if (["ended","rejected"].includes(snap.val())) endCall(false);
+
+    ref.child("status").on("value", snap => {
+      if (callRef !== ref) return;
+
+      if (["ended", "rejected"].includes(snap.val())) {
+        endCall(false);
+      } else if (snap.val() === "active") {
+        say("callStatus", "Call answered. Connecting…");
+      }
     });
-    say("callTitle","Calling "+(contacts[selected].name||contacts[selected].username));
-    say("callStatus","Ringing…");
-    show("answer",false); show("callBox",true);
-  } catch(e) {
-    say("chatStatus","Call failed: "+err(e));
+
+    say("callTitle",
+      "Calling " + (contacts[selected].name || contacts[selected].username));
+    say("callStatus", "Ringing…");
+    show("answer", false);
+    show("callBox", true);
+
+  } catch (e) {
+    say("chatStatus", "Call failed: " + err(e));
     await endCall(false);
   }
 }
-async function answerCall(id,c) {
+
+
+async function answerCall(id, c) {
+  const ref = db.ref("calls/" + id);
+
   try {
-    if (!contacts[c.callerId]) throw new Error("Add this caller to your contacts first.");
-    callRef = db.ref("calls/"+id);
-    callRole = "callee"; callType = c.type || "voice";
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio:true, video:callType==="video"
+    if (!me || !contacts[c.callerId]) {
+      throw new Error("Add this caller to your contacts first.");
+    }
+
+    await endCall(false);
+
+    callRef = ref;
+    incomingId = id;
+    callRole = "callee";
+    callType = c.type || "voice";
+
+    const localStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: callType === "video"
     });
-    $("localVideo").srcObject = stream;
-    $("localVideo").classList.toggle("hidden",callType!=="video");
-    $("remoteVideo").classList.toggle("hidden",callType!=="video");
-    newPeer();
-    stream.getTracks().forEach(t=>pc.addTrack(t,stream));
-    await pc.setRemoteDescription(new RTCSessionDescription(c.offer));
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-    await callRef.child("answer").set({type:answer.type,sdp:answer.sdp});
-    await callRef.child("status").set("active");
-    callRef.child("status").on("value",snap=>{
-      if (snap.val()==="ended") endCall(false);
+    stream = localStream;
+
+    $("localVideo").srcObject = localStream;
+    $("remoteVideo").srcObject = null;
+    $("localVideo").classList.toggle("hidden", callType !== "video");
+    $("remoteVideo").classList.toggle("hidden", callType !== "video");
+
+    const peer = newPeer();
+
+    localStream.getTracks().forEach(track => {
+      peer.addTrack(track, localStream);
     });
-    say("callStatus","Connecting…"); show("answer",false);
-  } catch(e) { say("callStatus","Could not answer: "+err(e)); }
+
+    const latest = await ref.once("value");
+    const call = latest.val();
+
+    if (!call || call.status !== "ringing" || !call.offer) {
+      throw new Error("This call is no longer available.");
+    }
+
+    await peer.setRemoteDescription(
+      new RTCSessionDescription(call.offer)
+    );
+    await peer.flushPendingCandidates();
+
+    const answer = await peer.createAnswer();
+    await peer.setLocalDescription(answer);
+
+    await ref.child("answer").set({
+      type: answer.type,
+      sdp: answer.sdp
+    });
+
+    await ref.child("status").set("active");
+
+    ref.child("status").on("value", snap => {
+      if (callRef === ref && snap.val() === "ended") {
+        endCall(false);
+      }
+    });
+
+    say("callTitle", "Call with " +
+      (contacts[c.callerId].name || contacts[c.callerId].username));
+    say("callStatus", "Connecting…");
+    show("callBox", true);
+    show("answer", false);
+
+  } catch (e) {
+    say("callStatus", "Could not answer: " + err(e));
+    console.error("Answer call error:", e);
+    await endCall(false);
+  }
 }
-async function endCall(writeStatus=true) {
-  if (writeStatus && callRef) {
-    try { await callRef.child("status").set("ended"); } catch(e) {}
+
+
+async function endCall(writeStatus = true) {
+  const ref = callRef;
+  const peer = pc;
+  const localStream = stream;
+
+  // আগে global state পরিষ্কার করি, যাতে পুরোনো call
+  // নতুন connection-এর state পরিবর্তন করতে না পারে।
+  callRef = null;
+  pc = null;
+  stream = null;
+  callRole = "";
+  incomingId = null;
+
+  if (writeStatus && ref) {
+    try {
+      await ref.child("status").set("ended");
+    } catch (e) {
+      console.warn("Could not update call status:", e);
+    }
   }
-  if (callRef) {
-    callRef.child("answer").off();
-    callRef.child("status").off();
-    callRef.child("callerCandidates").off();
-    callRef.child("calleeCandidates").off();
+
+  if (ref) {
+    ref.child("answer").off();
+    ref.child("status").off();
+    ref.child("callerCandidates").off();
+    ref.child("calleeCandidates").off();
   }
-  if (pc) { pc.close(); pc=null; }
-  if (stream) { stream.getTracks().forEach(t=>t.stop()); stream=null; }
+
+  if (peer) {
+    peer.ontrack = null;
+    peer.onicecandidate = null;
+    peer.onconnectionstatechange = null;
+    peer.close();
+  }
+
+  if (localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+  }
+
   $("localVideo").srcObject = null;
   $("remoteVideo").srcObject = null;
-  callRef = null; callRole = ""; incomingId = null;
-  show("callBox",false); show("answer",false);
+
+  show("callBox", false);
+  show("answer", false);
 }
+
 $("voice").onclick = () => startCall("voice");
 $("videoCall").onclick = () => startCall("video");
 $("endCall").onclick = () => endCall(true);
