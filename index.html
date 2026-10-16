@@ -1,108 +1,85 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Qurtuba Quest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qurtuba Quest Chat</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #0b141a;
       color: white;
+      min-height: 100vh;
     }
 
     header {
-      background: #202c33;
       padding: 20px;
+      background: #202c33;
       color: #25d366;
-      font-size: 27px;
+      font-size: 24px;
       font-weight: bold;
     }
 
-    .search {
-      padding: 12px;
+    .container {
+      width: min(92%, 420px);
+      margin: 45px auto;
+      padding: 24px;
+      background: #202c33;
+      border-radius: 16px;
     }
 
-    .search input {
+    h2 { margin-top: 0; }
+
+    input {
+      display: block;
       width: 100%;
       padding: 14px;
-      border: none;
-      border-radius: 25px;
-      background: #202c33;
+      margin: 12px 0;
+      border: 1px solid #40515a;
+      border-radius: 8px;
+      background: #0b141a;
       color: white;
       font-size: 16px;
     }
 
-    .chat {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px;
-      border-bottom: 1px solid #26343b;
+    button {
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 15px;
     }
 
-    .avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: #075e54;
-      display: grid;
-      place-items: center;
-      font-size: 22px;
-    }
-
-    .details {
-      flex: 1;
-    }
-
-    .details h3 {
-      margin: 0 0 7px;
-      font-size: 17px;
-    }
-
-    .details p {
-      margin: 0;
-      color: #aebac1;
-      font-size: 14px;
-    }
-
-    .time {
-      color: #86969e;
-      font-size: 12px;
-    }
-
-    nav {
-      position: fixed;
-      bottom: 0;
+    .primary {
       width: 100%;
-      display: flex;
-      justify-content: space-around;
-      background: #202c33;
-      padding: 15px 0;
+      margin-top: 10px;
+      background: #25d366;
+      color: #062b20;
+      font-weight: bold;
     }
 
-    nav button {
-      background: none;
-      border: none;
-      color: #d7e1e5;
-      font-size: 14px;
-    }
-
-    nav button:focus,
-    nav button:hover {
+    .secondary {
+      margin-top: 12px;
+      background: transparent;
       color: #25d366;
     }
 
-    main {
-      padding-bottom: 75px;
+    #status {
+      color: #ffcc80;
+      overflow-wrap: anywhere;
+      line-height: 1.5;
+    }
+
+    #app { display: none; }
+
+    .account {
+      overflow-wrap: anywhere;
+      color: #b9c8ce;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -110,73 +87,174 @@
 <body>
   <header>Qurtuba Quest</header>
 
-  <div class="search">
-    <input
-      id="search"
-      type="search"
-      placeholder="Search friends..."
-      oninput="searchChats()"
-    >
-  </div>
+  <section class="container" id="auth">
+    <h2 id="formTitle">Create Account</h2>
 
-  <main id="chats">
-    <div class="chat" onclick="openChat('Rahim')">
-      <div class="avatar">R</div>
-      <div class="details">
-        <h3>Rahim</h3>
-        <p>Hi! How are you?</p>
-      </div>
-      <span class="time">10:30</span>
-    </div>
+    <form id="authForm">
+      <input
+        id="email"
+        type="email"
+        placeholder="Email address"
+        autocomplete="email"
+        required
+      >
 
-    <div class="chat" onclick="openChat('Karim')">
-      <div class="avatar">K</div>
-      <div class="details">
-        <h3>Karim</h3>
-        <p>See you soon!</p>
-      </div>
-      <span class="time">09:45</span>
-    </div>
+      <input
+        id="password"
+        type="password"
+        placeholder="Password (at least 6 characters)"
+        minlength="6"
+        autocomplete="current-password"
+        required
+      >
 
-    <div class="chat" onclick="openChat('Sakib')">
-      <div class="avatar">S</div>
-      <div class="details">
-        <h3>Sakib</h3>
-        <p>How is your study?</p>
-      </div>
-      <span class="time">Yesterday</span>
-    </div>
-  </main>
+      <button class="primary" id="submitBtn" type="submit">
+        Sign Up
+      </button>
+    </form>
 
-  <nav>
-    <button onclick="showTab('Chats')">Chats</button>
-    <button onclick="showTab('Updates')">Updates</button>
-    <button onclick="showTab('Calls')">Calls</button>
-    <button onclick="showTab('Profile')">Profile</button>
-  </nav>
+    <button class="secondary" id="switchBtn" type="button">
+      Already have an account? Log In
+    </button>
+
+    <p id="status" role="status"></p>
+  </section>
+
+  <section class="container" id="app">
+    <h2>Welcome!</h2>
+    <p class="account">You are logged in.</p>
+    <p class="account" id="accountEmail"></p>
+
+    <p id="appStatus">
+      Your account is ready. Chat and calling are the next steps.
+    </p>
+
+    <button class="primary" id="logoutBtn">
+      Log Out
+    </button>
+  </section>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <script>
-    function searchChats() {
-      const query = document
-        .getElementById('search')
-        .value.toLowerCase();
+    const firebaseConfig = {
+      apiKey: "AIzaSyD82Z5nw75a5newgYv_IkbmQK-1yJXKN3k",
+      authDomain: "qurtuba-quest.firebaseapp.com",
+      databaseURL:
+        "https://qurtuba-quest-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "qurtuba-quest",
+      storageBucket: "qurtuba-quest.firebasestorage.app",
+      messagingSenderId: "138703537259",
+      appId: "1:138703537259:web:2af20c2b6d5d4567199d2e"
+    };
 
-      document.querySelectorAll('.chat').forEach(chat => {
-        chat.style.display =
-          chat.innerText.toLowerCase().includes(query)
-            ? 'flex'
-            : 'none';
-      });
-    }
+    firebase.initializeApp(firebaseConfig);
 
-    function openChat(name) {
-      alert('You selected ' + name +
-        '. Real messaging will be added next.');
-    }
+    const auth = firebase.auth();
 
-    function showTab(tab) {
-      alert(tab + ' feature will be added next.');
-    }
+    let isLogin = false;
+
+    const authSection = document.getElementById("auth");
+    const appSection = document.getElementById("app");
+    const status = document.getElementById("status");
+    const formTitle = document.getElementById("formTitle");
+    const submitBtn = document.getElementById("submitBtn");
+    const switchBtn = document.getElementById("switchBtn");
+    const passwordInput = document.getElementById("password");
+
+    switchBtn.addEventListener("click", () => {
+      isLogin = !isLogin;
+
+      formTitle.textContent =
+        isLogin ? "Log In" : "Create Account";
+
+      submitBtn.textContent =
+        isLogin ? "Log In" : "Sign Up";
+
+      switchBtn.textContent = isLogin
+        ? "Need an account? Sign Up"
+        : "Already have an account? Log In";
+
+      passwordInput.autocomplete =
+        isLogin ? "current-password" : "new-password";
+
+      status.textContent = "";
+    });
+
+    document.getElementById("authForm").addEventListener(
+      "submit",
+      async (event) => {
+        event.preventDefault();
+
+        const email = document
+          .getElementById("email").value.trim();
+
+        const password = passwordInput.value;
+
+        submitBtn.disabled = true;
+        status.textContent = "Please wait...";
+
+        try {
+          if (isLogin) {
+            await auth.signInWithEmailAndPassword(
+              email, password
+            );
+          } else {
+            await auth.createUserWithEmailAndPassword(
+              email, password
+            );
+          }
+        } catch (error) {
+          const messages = {
+            "auth/email-already-in-use":
+              "This email is already registered. Please log in.",
+            "auth/invalid-email":
+              "Please enter a valid email address.",
+            "auth/weak-password":
+              "Choose a stronger password.",
+            "auth/invalid-credential":
+              "Incorrect email or password.",
+            "auth/network-request-failed":
+              "Network error. Check your internet connection."
+          };
+
+          status.textContent =
+            messages[error.code] ||
+            "Error: " + error.message;
+        } finally {
+          submitBtn.disabled = false;
+        }
+      }
+    );
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        authSection.style.display = "none";
+        appSection.style.display = "block";
+
+        document.getElementById("accountEmail").textContent =
+          user.email || "";
+
+      } else {
+        authSection.style.display = "block";
+        appSection.style.display = "none";
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener(
+      "click",
+      async () => {
+        try {
+          await auth.signOut();
+        } catch (error) {
+          document.getElementById("appStatus").textContent =
+            "Could not log out: " + error.message;
+        }
+      }
+    );
   </script>
 </body>
 </html>
