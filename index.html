@@ -1,283 +1,501 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Qurtuba Quest Chat</title>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b141a;
-      color: white;
-      min-height: 100vh;
-    }
-
-    header {
-      padding: 20px;
-      background: #202c33;
-      color: #25d366;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .container {
-      width: min(92%, 420px);
-      margin: 45px auto;
-      padding: 24px;
-      background: #202c33;
-      border-radius: 16px;
-    }
-
-    h2 { margin-top: 0; }
-
-    input {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      margin: 12px 0;
-      border: 1px solid #40515a;
-      border-radius: 8px;
-      background: #0b141a;
-      color: white;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 12px 16px;
-      border: 0;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 15px;
-    }
-
-    .primary {
-      width: 100%;
-      margin-top: 10px;
-      background: #25d366;
-      color: #062b20;
-      font-weight: bold;
-    }
-
-    .secondary {
-      margin-top: 12px;
-      background: transparent;
-      color: #25d366;
-    }
-
-    #status {
-      color: #ffcc80;
-      overflow-wrap: anywhere;
-      line-height: 1.5;
-    }
-
-    #app { display: none; }
-
-    .account {
-      overflow-wrap: anywhere;
-      color: #b9c8ce;
-      line-height: 1.6;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qurtuba Quest</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b141a;color:#e9edef;font:15px Arial}
+header{background:#202c33;padding:16px;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:21px;margin:0;color:#25d366}
+main{max-width:900px;margin:auto;padding:12px}
+section,.panel{background:#111b21;border-radius:12px;padding:15px;margin-bottom:12px}
+input{width:100%;padding:12px;margin:5px 0;border:1px solid #35434b;border-radius:7px;background:#202c33;color:white}
+button{padding:11px 13px;border:0;border-radius:7px;background:#25d366;color:#071b12;font-weight:bold;cursor:pointer;margin:3px}
+.secondary{background:#35434b;color:white}
+.danger{background:#e74c5b;color:white}
+.hidden{display:none!important}
+.row{display:flex;gap:6px;align-items:center}
+.row input{flex:1;min-width:0}
+#contacts button{display:block;width:100%;text-align:left;background:#202c33;color:white;margin:5px 0}
+#contacts button.active{border:1px solid #25d366}
+#messages{height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:8px;background:#0b141a;border-radius:8px}
+.msg{max-width:85%;background:#202c33;border-radius:9px;padding:10px;overflow-wrap:anywhere;white-space:pre-wrap}
+.mine{align-self:flex-end;background:#005c4b}
+small,.muted{color:#aebac1}
+#status,#contactStatus{font-size:13px;white-space:pre-wrap}
+video{width:48%;max-height:240px;background:#202c33}
+@media(max-width:600px){main{padding:8px}#messages{height:280px}}
+</style>
 </head>
-
 <body>
-  <header>Qurtuba Quest</header>
+<header>
+<h1>☾ Qurtuba Quest</h1>
+<button id="logout" class="secondary hidden">Logout</button>
+</header>
 
-  <section class="container" id="auth">
-    <h2 id="formTitle">Create Account</h2>
+<main>
+<section id="auth">
+<h2>Welcome</h2>
+<input id="email" type="email" placeholder="Email address" autocomplete="email">
+<input id="password" type="password" placeholder="Password (minimum 6 characters)">
+<div class="row">
+<button id="login" style="flex:1">Login</button>
+<button id="signup" style="flex:1">Sign up</button>
+</div>
+<p id="status"></p>
+</section>
 
-    <form id="authForm">
-      <input
-        id="email"
-        type="email"
-        placeholder="Email address"
-        autocomplete="email"
-        required
-      >
+<section id="profile" class="hidden">
+<h2>Create Username</h2>
+<p class="muted">Use 3–20 lowercase letters, numbers or underscores.</p>
+<input id="username" maxlength="20" placeholder="e.g. shadik123">
+<button id="saveUsername">Save Username</button>
+<p id="profileStatus"></p>
+</section>
 
-      <input
-        id="password"
-        type="password"
-        placeholder="Password (at least 6 characters)"
-        minlength="6"
-        autocomplete="current-password"
-        required
-      >
+<div id="app" class="hidden">
+<section>
+<h2>My Account</h2>
+<p>Username: <b id="myName"></b></p>
+</section>
 
-      <button class="primary" id="submitBtn" type="submit">
-        Sign Up
-      </button>
-    </form>
+<section>
+<h2>Add Contact</h2>
+<input id="friendUsername" placeholder="Friend's username">
+<input id="friendName" maxlength="40" placeholder="Name to save, e.g. Rahim">
+<button id="addContact">＋ Add Contact</button>
+<p id="contactStatus"></p>
+</section>
 
-    <button class="secondary" id="switchBtn" type="button">
-      Already have an account? Log In
-    </button>
+<section>
+<h2>Search Saved Contacts</h2>
+<input id="search" placeholder="Search by name or username">
+<div id="contacts"></div>
+</section>
 
-    <p id="status" role="status"></p>
-  </section>
+<section id="chat" class="hidden">
+<div class="row" style="justify-content:space-between">
+<div><h2 id="chatName">Chat</h2><small id="chatUsername"></small></div>
+<button id="back" class="secondary">Back</button>
+</div>
+<div class="row">
+<button id="voice">☎ Voice Call</button>
+<button id="videoCall">▣ Video Call</button>
+</div>
+<p id="chatStatus"></p>
+<div id="messages"></div>
+<form id="sendForm" class="row">
+<input id="message" maxlength="4000" placeholder="Type a message..." autocomplete="off">
+<button>Send</button>
+</form>
+</section>
 
-  <section class="container" id="app">
-    <h2>Welcome!</h2>
-    <p class="account">You are logged in.</p>
-    <p class="account" id="accountEmail"></p>
+<section id="callBox" class="hidden">
+<h2 id="callTitle">Call</h2>
+<p id="callStatus">Connecting…</p>
+<div>
+<video id="remoteVideo" autoplay playsinline></video>
+<video id="localVideo" autoplay muted playsinline></video>
+</div>
+<button id="answer" class="hidden">Answer</button>
+<button id="endCall" class="danger">End Call</button>
+</section>
+</div>
+</main>
 
-    <p id="appStatus">
-      Your account is ready. Chat and calling are the next steps.
-    </p>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-    <button class="primary" id="logoutBtn">
-      Log Out
-    </button>
-  </section>
+<script>
+// Your existing Qurtuba Quest Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD82Z5nw75a5newgYv_IkbmQK-1yJXKN3k",
+  authDomain: "qurtuba-quest.firebaseapp.com",
+  databaseURL: "https://qurtuba-quest-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "qurtuba-quest",
+  storageBucket: "qurtuba-quest.firebasestorage.app",
+  messagingSenderId: "138703537259",
+  appId: "1:138703537259:web:2af20c2b6d5d4567199d2e"
+};
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const $ = id => document.getElementById(id);
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD82Z5nw75a5newgYv_IkbmQK-1yJXKN3k",
-      authDomain: "qurtuba-quest.firebaseapp.com",
-      databaseURL:
-        "https://qurtuba-quest-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "qurtuba-quest",
-      storageBucket: "qurtuba-quest.firebasestorage.app",
-      messagingSenderId: "138703537259",
-      appId: "1:138703537259:web:2af20c2b6d5d4567199d2e"
+let me = null, myUsername = "", contacts = {}, selected = null;
+let msgRefs = [], callRef = null, pc = null, stream = null;
+let callRole = "", incomingId = null, callType = "voice";
+
+const rtcConfig = {
+  iceServers: [{urls:"stun:stun.l.google.com:19302"}]
+};
+
+function show(id, yes) {
+  $(id).classList.toggle("hidden", !yes);
+}
+function say(id, text) { $(id).textContent = text || ""; }
+function norm(s) { return s.trim().toLowerCase(); }
+function validUsername(s) { return /^[a-z0-9_]{3,20}$/.test(s); }
+function err(e) {
+  return e.code === "PERMISSION_DENIED"
+    ? "Firebase Rules permission denied. Check your Database Rules."
+    : (e.message || "Something went wrong.");
+}
+
+$("login").onclick = async () => {
+  try {
+    await auth.signInWithEmailAndPassword(
+      $("email").value.trim(), $("password").value
+    );
+    say("status","");
+  } catch(e) { say("status",err(e)); }
+};
+
+$("signup").onclick = async () => {
+  try {
+    await auth.createUserWithEmailAndPassword(
+      $("email").value.trim(), $("password").value
+    );
+    say("status","");
+  } catch(e) { say("status",err(e)); }
+};
+
+$("logout").onclick = async () => {
+  await endCall(false);
+  await auth.signOut();
+};
+
+auth.onAuthStateChanged(async user => {
+  cleanupMessages();
+  me = user;
+  if (!user) {
+    myUsername = ""; contacts = {}; selected = null;
+    show("auth",true); show("profile",false);
+    show("app",false); show("logout",false);
+    return;
+  }
+  show("auth",false); show("logout",true);
+  try {
+    const snap = await db.ref("users/"+user.uid).once("value");
+    const profile = snap.val();
+    if (!profile || !profile.username) {
+      show("profile",true); show("app",false);
+      return;
+    }
+    myUsername = profile.username;
+    say("myName","@"+myUsername);
+    show("profile",false); show("app",true);
+    watchContacts();
+    watchIncomingCalls();
+  } catch(e) {
+    show("profile",true); say("profileStatus",err(e));
+  }
+});
+
+$("saveUsername").onclick = async () => {
+  if (!me) return;
+  const username = norm($("username").value);
+  if (!validUsername(username)) {
+    say("profileStatus","Use 3–20 lowercase letters, numbers or underscores.");
+    return;
+  }
+  $("saveUsername").disabled = true;
+  try {
+    const ref = db.ref("usernames/"+username);
+    const result = await ref.transaction(v => v === null ? me.uid : undefined);
+    if (!result.committed || result.snapshot.val() !== me.uid) {
+      say("profileStatus","Username already taken. Try another.");
+      return;
+    }
+    await db.ref("users/"+me.uid).set({username});
+    myUsername = username;
+    say("myName","@"+username);
+    show("profile",false); show("app",true);
+    watchContacts(); watchIncomingCalls();
+  } catch(e) { say("profileStatus",err(e)); }
+  finally { $("saveUsername").disabled = false; }
+};
+
+$("addContact").onclick = async () => {
+  if (!me) return;
+  const username = norm($("friendUsername").value);
+  const name = $("friendName").value.trim();
+  if (!validUsername(username)) {
+    say("contactStatus","Enter a valid username."); return;
+  }
+  if (!name || name.length > 40) {
+    say("contactStatus","Name must be 1–40 characters."); return;
+  }
+  $("addContact").disabled = true;
+  try {
+    const snap = await db.ref("usernames/"+username).once("value");
+    if (!snap.exists()) { say("contactStatus","Username not found."); return; }
+    const uid = snap.val();
+    if (uid === me.uid) { say("contactStatus","You cannot add yourself."); return; }
+    await db.ref("contacts/"+me.uid+"/"+uid).set({
+      name, username, addedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    $("friendUsername").value = "";
+    $("friendName").value = "";
+    say("contactStatus","Contact saved successfully.");
+  } catch(e) { say("contactStatus",err(e)); }
+  finally { $("addContact").disabled = false; }
+};
+
+let contactRef = null;
+function watchContacts() {
+  if (!me) return;
+  if (contactRef) contactRef.off();
+  contactRef = db.ref("contacts/"+me.uid);
+  contactRef.on("value", snap => {
+    contacts = snap.val() || {};
+    renderContacts();
+    watchIncomingCalls();
+    if (selected && !contacts[selected]) clearChat();
+  }, e => say("contactStatus",err(e)));
+}
+
+$("search").oninput = renderContacts;
+function renderContacts() {
+  const list = $("contacts");
+  list.replaceChildren();
+  const q = norm($("search").value);
+  const items = Object.entries(contacts).filter(([uid,c]) =>
+    (c.name||"").toLowerCase().includes(q) ||
+    (c.username||"").toLowerCase().includes(q)
+  );
+  if (!items.length) {
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = q ? "No matching saved contacts." : "No saved contacts yet.";
+    list.appendChild(p);
+  }
+  for (const [uid,c] of items) {
+    const b = document.createElement("button");
+    b.className = uid === selected ? "active" : "";
+    b.textContent = (c.name||c.username)+"  (@"+(c.username||"")+")";
+    b.onclick = () => openChat(uid);
+    list.appendChild(b);
+    const remove = document.createElement("button");
+    remove.className = "secondary";
+    remove.textContent = "Remove";
+    remove.onclick = async () => {
+      if (!confirm("Remove this contact?")) return;
+      try {
+        if (selected === uid) clearChat();
+        await db.ref("contacts/"+me.uid+"/"+uid).remove();
+      } catch(e) { say("contactStatus",err(e)); }
     };
+    list.appendChild(remove);
+  }
+}
 
-    firebase.initializeApp(firebaseConfig);
+function openChat(uid) {
+  if (!contacts[uid]) return;
+  cleanupMessages();
+  selected = uid;
+  say("chatName",contacts[uid].name || contacts[uid].username);
+  say("chatUsername","@"+contacts[uid].username);
+  show("chat",true);
+  renderContacts();
+  loadMessages(uid);
+}
+$("back").onclick = () => show("chat",false);
 
-    const auth = firebase.auth();
-
-    let isLogin = false;
-
-    const authSection = document.getElementById("auth");
-    const appSection = document.getElementById("app");
-    const status = document.getElementById("status");
-    const formTitle = document.getElementById("formTitle");
-    const submitBtn = document.getElementById("submitBtn");
-    const switchBtn = document.getElementById("switchBtn");
-    const passwordInput = document.getElementById("password");
-
-    switchBtn.addEventListener("click", () => {
-      isLogin = !isLogin;
-
-      formTitle.textContent =
-        isLogin ? "Log In" : "Create Account";
-
-      submitBtn.textContent =
-        isLogin ? "Log In" : "Sign Up";
-
-      switchBtn.textContent = isLogin
-        ? "Need an account? Sign Up"
-        : "Already have an account? Log In";
-
-      passwordInput.autocomplete =
-        isLogin ? "current-password" : "new-password";
-
-      status.textContent = "";
+function clearChat() {
+  cleanupMessages();
+  selected = null;
+  show("chat",false);
+  renderContacts();
+}
+function cleanupMessages() {
+  msgRefs.forEach(ref => ref.off());
+  msgRefs = [];
+}
+function loadMessages(peer) {
+  const all = new Map();
+  function render() {
+    const box = $("messages");
+    box.replaceChildren();
+    const sorted = [...all.values()].sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+    if (!sorted.length) {
+      const p = document.createElement("p");
+      p.className = "muted"; p.textContent = "No messages yet. Say hello!";
+      box.appendChild(p);
+    }
+    sorted.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "msg"+(m.senderId===me.uid?" mine":"");
+      const text = document.createElement("div");
+      text.textContent = m.text || "";
+      const time = document.createElement("small");
+      time.textContent = m.timestamp ? new Date(m.timestamp).toLocaleString() : "Sending…";
+      div.append(text,time); box.appendChild(div);
     });
+    box.scrollTop = box.scrollHeight;
+  }
+  [[me.uid,peer],[peer,me.uid]].forEach(([from,to]) => {
+    const ref = db.ref("messages/"+from+"/"+to);
+    msgRefs.push(ref);
+    ref.on("child_added",snap => {
+      all.set(from+":"+snap.key,snap.val()); render();
+    },e => say("chatStatus",err(e)));
+    ref.on("child_changed",snap => {
+      all.set(from+":"+snap.key,snap.val()); render();
+    });
+    ref.on("child_removed",snap => {
+      all.delete(from+":"+snap.key); render();
+    });
+  });
+}
 
-<div id="profileSetup" style="display:none; padding:15px;">
-  <h3>Create Your Username</h3>
-  <p>অন্যরা এই Username দিয়ে তোমাকে খুঁজতে পারবে।</p>
-  <input id="myUsername" placeholder="যেমন: shadik123" />
-  <button id="saveUsernameBtn">Save Username</button>
-  <p id="profileMessage"></p>
-</div>
+$("sendForm").onsubmit = async e => {
+  e.preventDefault();
+  if (!me || !selected || !contacts[selected]) return;
+  const text = $("message").value.trim();
+  if (!text) return;
+  $("message").value = "";
+  try {
+    await db.ref("messages/"+me.uid+"/"+selected).push({
+      senderId:me.uid, recipientId:selected, text,
+      timestamp:firebase.database.ServerValue.TIMESTAMP
+    });
+    say("chatStatus","");
+  } catch(e2) {
+    $("message").value = text;
+    say("chatStatus",err(e2));
+  }
+};
 
-<div id="contactsSection" style="display:none; padding:15px;">
-  <h2>Qurtuba Quest Contacts</h2>
-  <p>My Username: <b id="myUsernameLabel"></b></p>
-
-  <h3>Add Contact</h3>
-  <input id="contactUsername" placeholder="বন্ধুর Username" />
-  <input id="contactDisplayName" placeholder="Contact-এর নাম, যেমন Rahim" />
-  <button id="addContactBtn">Add Contact</button>
-  <p id="contactMessage"></p>
-
-  <h3>My Contacts</h3>
-  <input id="contactSearch" placeholder="Saved Contacts Search..." />
-  <div id="contactsList"></div>
-</div>
-  
-    document.getElementById("authForm").addEventListener(
-      "submit",
-      async (event) => {
-        event.preventDefault();
-
-        const email = document
-          .getElementById("email").value.trim();
-
-        const password = passwordInput.value;
-
-        submitBtn.disabled = true;
-        status.textContent = "Please wait...";
-
-        try {
-          if (isLogin) {
-            await auth.signInWithEmailAndPassword(
-              email, password
-            );
-          } else {
-            await auth.createUserWithEmailAndPassword(
-              email, password
-            );
-          }
-        } catch (error) {
-          const messages = {
-            "auth/email-already-in-use":
-              "This email is already registered. Please log in.",
-            "auth/invalid-email":
-              "Please enter a valid email address.",
-            "auth/weak-password":
-              "Choose a stronger password.",
-            "auth/invalid-credential":
-              "Incorrect email or password.",
-            "auth/network-request-failed":
-              "Network error. Check your internet connection."
-          };
-
-          status.textContent =
-            messages[error.code] ||
-            "Error: " + error.message;
-        } finally {
-          submitBtn.disabled = false;
-        }
-      }
-    );
-
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        authSection.style.display = "none";
-        appSection.style.display = "block";
-
-        document.getElementById("accountEmail").textContent =
-          user.email || "";
-
-      } else {
-        authSection.style.display = "block";
-        appSection.style.display = "none";
+// WebRTC calls: both users must save each other as contacts in this MVP.
+function watchIncomingCalls() {
+  if (!me) return;
+  db.ref("calls").off("child_added", onIncomingCall);
+  db.ref("calls").on("child_added", onIncomingCall);
+}
+function onIncomingCall(snap) {
+  const c = snap.val();
+  if (!c || c.receiverId !== me?.uid || c.status !== "ringing") return;
+  if (!contacts[c.callerId] || incomingId === snap.key) return;
+  incomingId = snap.key;
+  callRef = db.ref("calls/"+snap.key);
+  callRole = "callee";
+  callType = c.type || "voice";
+  say("callTitle",(contacts[c.callerId].name||"Contact")+" is calling");
+  say("callStatus","Incoming "+callType+" call");
+  show("callBox",true); show("answer",true);
+  $("answer").onclick = () => answerCall(snap.key,c);
+}
+function newPeer() {
+  pc = new RTCPeerConnection(rtcConfig);
+  pc.ontrack = e => {
+    if (e.streams[0]) $("remoteVideo").srcObject = e.streams[0];
+  };
+  pc.onicecandidate = e => {
+    if (e.candidate && callRef) {
+      const path = callRole === "caller" ? "callerCandidates" : "calleeCandidates";
+      callRef.child(path).push(e.candidate.toJSON());
+    }
+  };
+  const remotePath = callRole === "caller" ? "calleeCandidates" : "callerCandidates";
+  callRef.child(remotePath).on("child_added", async snap => {
+    if (!pc || !snap.val()) return;
+    try { await pc.addIceCandidate(new RTCIceCandidate(snap.val())); }
+    catch(e) { console.warn(e); }
+  });
+  pc.onconnectionstatechange = () => {
+    if (pc && pc.connectionState === "connected") say("callStatus","Connected");
+    if (pc && pc.connectionState === "failed") say("callStatus","Connection failed; a TURN server may be needed.");
+  };
+}
+async function startCall(type) {
+  if (!selected || !contacts[selected]) return;
+  try {
+    await endCall(false);
+    callType = type;
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio:true, video:type==="video"
+    });
+    $("localVideo").srcObject = stream;
+    $("localVideo").classList.toggle("hidden",type!=="video");
+    $("remoteVideo").classList.toggle("hidden",type!=="video");
+    callRef = db.ref("calls").push();
+    callRole = "caller";
+    newPeer();
+    stream.getTracks().forEach(t=>pc.addTrack(t,stream));
+    const offer = await pc.createOffer();
+    await callRef.set({
+      callerId:me.uid, receiverId:selected, type,
+      offer:{type:offer.type,sdp:offer.sdp},
+      status:"ringing", createdAt:firebase.database.ServerValue.TIMESTAMP
+    });
+    await pc.setLocalDescription(offer);
+    callRef.child("answer").on("value",async snap=>{
+      if (snap.val() && pc && !pc.currentRemoteDescription) {
+        try { await pc.setRemoteDescription(new RTCSessionDescription(snap.val())); }
+        catch(e) { console.warn(e); }
       }
     });
-
-    document.getElementById("logoutBtn").addEventListener(
-      "click",
-      async () => {
-        try {
-          await auth.signOut();
-        } catch (error) {
-          document.getElementById("appStatus").textContent =
-            "Could not log out: " + error.message;
-        }
-      }
-    );
-  </script>
+    callRef.child("status").on("value",snap=>{
+      if (["ended","rejected"].includes(snap.val())) endCall(false);
+    });
+    say("callTitle","Calling "+(contacts[selected].name||contacts[selected].username));
+    say("callStatus","Ringing…");
+    show("answer",false); show("callBox",true);
+  } catch(e) {
+    say("chatStatus","Call failed: "+err(e));
+    await endCall(false);
+  }
+}
+async function answerCall(id,c) {
+  try {
+    if (!contacts[c.callerId]) throw new Error("Add this caller to your contacts first.");
+    callRef = db.ref("calls/"+id);
+    callRole = "callee"; callType = c.type || "voice";
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio:true, video:callType==="video"
+    });
+    $("localVideo").srcObject = stream;
+    $("localVideo").classList.toggle("hidden",callType!=="video");
+    $("remoteVideo").classList.toggle("hidden",callType!=="video");
+    newPeer();
+    stream.getTracks().forEach(t=>pc.addTrack(t,stream));
+    await pc.setRemoteDescription(new RTCSessionDescription(c.offer));
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await callRef.child("answer").set({type:answer.type,sdp:answer.sdp});
+    await callRef.child("status").set("active");
+    callRef.child("status").on("value",snap=>{
+      if (snap.val()==="ended") endCall(false);
+    });
+    say("callStatus","Connecting…"); show("answer",false);
+  } catch(e) { say("callStatus","Could not answer: "+err(e)); }
+}
+async function endCall(writeStatus=true) {
+  if (writeStatus && callRef) {
+    try { await callRef.child("status").set("ended"); } catch(e) {}
+  }
+  if (callRef) {
+    callRef.child("answer").off();
+    callRef.child("status").off();
+    callRef.child("callerCandidates").off();
+    callRef.child("calleeCandidates").off();
+  }
+  if (pc) { pc.close(); pc=null; }
+  if (stream) { stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  $("localVideo").srcObject = null;
+  $("remoteVideo").srcObject = null;
+  callRef = null; callRole = ""; incomingId = null;
+  show("callBox",false); show("answer",false);
+}
+$("voice").onclick = () => startCall("voice");
+$("videoCall").onclick = () => startCall("video");
+$("endCall").onclick = () => endCall(true);
+</script>
 </body>
 </html>
