@@ -184,6 +184,29 @@
       status.textContent = "";
     });
 
+<div id="profileSetup" style="display:none; padding:15px;">
+  <h3>Create Your Username</h3>
+  <p>অন্যরা এই Username দিয়ে তোমাকে খুঁজতে পারবে।</p>
+  <input id="myUsername" placeholder="যেমন: shadik123" />
+  <button id="saveUsernameBtn">Save Username</button>
+  <p id="profileMessage"></p>
+</div>
+
+<div id="contactsSection" style="display:none; padding:15px;">
+  <h2>Qurtuba Quest Contacts</h2>
+  <p>My Username: <b id="myUsernameLabel"></b></p>
+
+  <h3>Add Contact</h3>
+  <input id="contactUsername" placeholder="বন্ধুর Username" />
+  <input id="contactDisplayName" placeholder="Contact-এর নাম, যেমন Rahim" />
+  <button id="addContactBtn">Add Contact</button>
+  <p id="contactMessage"></p>
+
+  <h3>My Contacts</h3>
+  <input id="contactSearch" placeholder="Saved Contacts Search..." />
+  <div id="contactsList"></div>
+</div>
+  
     document.getElementById("authForm").addEventListener(
       "submit",
       async (event) => {
