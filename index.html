@@ -156,14 +156,43 @@ $("login").onclick = async () => {
   } catch(e) { say("status",err(e)); }
 };
 
+
 $("signup").onclick = async () => {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!email || !password) {
+    say("status", "Gmail এবং password লিখো।");
+    return;
+  }
+
   try {
-    await auth.createUserWithEmailAndPassword(
-      $("email").value.trim(), $("password").value
+    const result = await auth.createUserWithEmailAndPassword(
+      email,
+      password
     );
-    say("status","");
-  } catch(e) { say("status",err(e)); }
+
+    // নতুন Firebase account-এর নিজস্ব UID থাকবে।
+    // Username এখনো তৈরি না হলে profile setup দেখাবে।
+    const uid = result.user.uid;
+    const profile = await db.ref("users/" + uid).once("value");
+
+    if (!profile.exists() || !profile.val().username) {
+      $("username").value = "";
+      show("auth", false);
+      show("profile", true);
+      show("app", false);
+      say("profileStatus", "নতুন Account! এবার নিজের Username তৈরি করো।");
+    }
+  } catch (e) {
+    if (e.code === "auth/email-already-in-use") {
+      say("status", "এই Gmail দিয়ে Account আগে থেকেই আছে। নতুন Gmail ব্যবহার করো অথবা Login করো।");
+    } else {
+      say("status", err(e));
+    }
+  }
 };
+
 
 $("logout").onclick = async () => {
   await endCall(false);
