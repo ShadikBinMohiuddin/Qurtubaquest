@@ -28,6 +28,55 @@ small,.muted{color:#aebac1}
 #status,#contactStatus{font-size:13px;white-space:pre-wrap}
 video{width:48%;max-height:240px;background:#202c33}
 @media(max-width:600px){main{padding:8px}#messages{height:280px}}
+
+/* Full-screen chat page */
+#chat.chat-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100%;
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  border-radius: 0;
+  padding: calc(12px + env(safe-area-inset-top))
+           12px
+           calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+#chat.chat-screen .chat-heading {
+  flex-shrink: 0;
+}
+
+#chat.chat-screen #messages {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+#chat.chat-screen #chatStatus,
+#chat.chat-screen #sendForm {
+  flex-shrink: 0;
+}
+
+#chat.chat-screen #message {
+  min-width: 0;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  #chat.chat-screen {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -326,22 +375,47 @@ function renderContacts() {
 
 function openChat(uid) {
   if (!contacts[uid]) return;
+
   cleanupMessages();
   selected = uid;
-  say("chatName",contacts[uid].name || contacts[uid].username);
-  say("chatUsername","@"+contacts[uid].username);
-  show("chat",true);
+
+  say("chatName", contacts[uid].name || contacts[uid].username);
+  say("chatUsername", "@" + contacts[uid].username);
+  say("chatStatus", "");
+
+  $("messages").replaceChildren();
+  $("message").value = "";
+
+  show("chat", true);
+  $("chat").classList.add("chat-screen");
+
   renderContacts();
   loadMessages(uid);
 }
-$("back").onclick = () => show("chat",false);
+
+$("back").onclick = () => {
+  cleanupMessages();
+
+  show("chat", false);
+  $("chat").classList.remove("chat-screen");
+
+  selected = null;
+  $("message").value = "";
+
+  renderContacts();
+};
 
 function clearChat() {
   cleanupMessages();
+
   selected = null;
-  show("chat",false);
+  show("chat", false);
+  $("chat").classList.remove("chat-screen");
+
   renderContacts();
 }
+
+
 function cleanupMessages() {
   msgRefs.forEach(ref => ref.off());
   msgRefs = [];
