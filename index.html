@@ -477,6 +477,7 @@ $("sendForm").onsubmit = async e => {
 
 // WebRTC calls: both users must save each other as contacts in this MVP.
 
+
 function watchIncomingCalls() {
   if (!me) return;
 
@@ -484,11 +485,29 @@ function watchIncomingCalls() {
 
   callsRef.off("child_added", onIncomingCall);
 
-  callsRef.on("child_added", onIncomingCall, error => {
-    console.error("Incoming calls listener error:", error);
-    say("chatStatus", "Incoming call error: " + error.message);
+  callsRef.on(
+    "child_added",
+    onIncomingCall,
+    error => {
+      console.error("Incoming call listener error:", error);
+      say("chatStatus", "Incoming call error: " + error.message);
+    }
+  );
+
+  // নতুন call-এর status পরিবর্তন হলে সেটিও পরীক্ষা করো।
+  callsRef.on("child_changed", snap => {
+    const c = snap.val();
+
+    if (
+      c &&
+      c.receiverId === me.uid &&
+      c.status === "ringing"
+    ) {
+      console.log("Incoming ringing call:", snap.key, c);
+    }
   });
 }
+
 
 function onIncomingCall(snap) {
   const c = snap.val();
