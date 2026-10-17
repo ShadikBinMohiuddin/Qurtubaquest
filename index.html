@@ -2,48 +2,69 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Qurtuba Quest</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b141a'/><path d='M12 38C12 20 28 12 42 14c8 2 8 14 4 26-2 6-10 8-20 8-9 0-14-4-14-10z' fill='%2322c55e'/><path d='M58 14c20-2 32 10 30 28-1 8-12 10-22 8-8-2-12-8-10-18 1-8 0-16 2-18z' fill='%231d6ff2'/><path d='M14 56c2-8 14-10 24-6 8 3 8 12 6 22-2 10-12 18-24 14C8 82 10 66 14 56z' fill='%237c3aed'/><path d='M58 58c6-6 18-6 26 0 6 6 4 20-6 28-12 8-26 4-26-8 0-8 2-14 6-20z' fill='%23f59e0b'/></svg>">
 <style>
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:#0b141a;color:#e9edef;font:15px Arial}
-header{background:#202c33;padding:16px;display:flex;justify-content:space-between;align-items:center}
-h1{font-size:21px;margin:0;color:#25d366}
-main{max-width:900px;margin:auto;padding:12px}
+header{background:#202c33;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;min-height:58px}
+h1{font-size:20px;margin:0;color:#25d366;flex:1}
+main{max-width:900px;margin:auto;padding:12px 12px 100px}
 section,.panel{background:#111b21;border-radius:12px;padding:15px;margin-bottom:12px}
-input{width:100%;padding:12px;margin:5px 0;border:1px solid #35434b;border-radius:7px;background:#202c33;color:white}
-button{padding:11px 13px;border:0;border-radius:7px;background:#25d366;color:#071b12;font-weight:bold;cursor:pointer;margin:3px}
+h2{margin:0 0 10px}
+input{width:100%;padding:12px;margin:5px 0;border:1px solid #35434b;border-radius:7px;background:#202c33;color:white;font-size:15px}
+button{padding:11px 13px;border:0;border-radius:7px;background:#25d366;color:#071b12;font-weight:bold;cursor:pointer;margin:3px;font-size:14px}
 .secondary{background:#35434b;color:white}
 .danger{background:#e74c5b;color:white}
 .hidden{display:none!important}
 .row{display:flex;gap:6px;align-items:center}
 .row input{flex:1;min-width:0}
-#contacts button{display:block;width:100%;text-align:left;background:#202c33;color:white;margin:5px 0}
-#contacts button.active{border:1px solid #25d366}
+small,.muted{color:#aebac1}
+.center{text-align:center}
+#status,#profileStatus,#listStatus,#setStatus{font-size:13px;white-space:pre-wrap}
+
+/* Home tiles */
+#tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:420px;margin:18px auto}
+.tile{aspect-ratio:1;margin:0;border:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:bold;box-shadow:inset 0 3px 8px rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.4)}
+.tile svg{width:30%;height:auto}
+.t1{background:linear-gradient(145deg,#4ade80,#047857);border-radius:55% 45% 48% 52%/60% 52% 48% 40%;color:#fff}
+.t2{background:linear-gradient(145deg,#38a1ff,#0040d0);border-radius:48% 52% 45% 55%/52% 58% 42% 48%}
+.t3{background:linear-gradient(145deg,#b455ff,#4313c8);border-radius:52% 48% 58% 42%/45% 50% 50% 55%}
+.t4{background:linear-gradient(145deg,#ffd21f,#f2600a);border-radius:45% 55% 52% 48%/55% 45% 55% 45%}
+.t1 svg{color:#15803d}.t2 svg{color:#0050e0}.t3 svg{color:#5b21b6}.t4 svg{color:#d9480f}
+
+/* Lists */
+.item{display:flex;align-items:center;gap:12px;background:#202c33;border-radius:12px;padding:10px 12px;margin:8px 0}
+.item.click{cursor:pointer}
+.av{width:42px;height:42px;border-radius:50%;background:#25d366;color:#071b12;display:grid;place-items:center;font-weight:bold;flex-shrink:0}
+.info{flex:1;min-width:0}
+.info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Bottom bar */
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:500;background:#202c33;display:flex;justify-content:space-between;padding:8px 36px calc(8px + env(safe-area-inset-bottom));border-top:1px solid #35434b}
+#nav button{background:none;color:#aebac1;margin:0;padding:8px 16px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px}
+#nav button.on{color:#25d366}
+#nav svg{width:28px;height:28px}
+
+/* Chat */
 #messages{height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:8px;background:#0b141a;border-radius:8px}
 .msg{max-width:85%;background:#202c33;border-radius:9px;padding:10px;overflow-wrap:anywhere;white-space:pre-wrap}
 .mine{align-self:flex-end;background:#005c4b}
-small,.muted{color:#aebac1}
-#status,#contactStatus{font-size:13px;white-space:pre-wrap}
-video{width:48%;max-height:240px;background:#202c33}
-@media(max-width:600px){main{padding:8px}#messages{height:280px}}
-
 #chat.chat-screen{position:fixed;inset:0;z-index:1000;width:100%;max-width:none;height:100vh;height:100dvh;margin:0;border-radius:0;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;overflow:hidden}
-#chat.chat-screen .chat-heading{flex-shrink:0}
 #chat.chat-screen #messages{flex:1;height:auto;min-height:0;overflow-y:auto}
 #chat.chat-screen #chatStatus,#chat.chat-screen #sendForm{flex-shrink:0}
 #chat.chat-screen #message{min-width:0;margin:0}
-@media(max-width:600px){#chat.chat-screen{padding-left:10px;padding-right:10px}}
 
-/* Call screen above the chat screen */
-#callBox{position:relative;z-index:2000}
-#callBox:not(.hidden){position:fixed;inset:0;margin:0;border-radius:0;overflow:auto}
+/* Call */
+video{width:48%;max-height:240px;background:#202c33}
+#callBox:not(.hidden){position:fixed;inset:0;z-index:2000;margin:0;border-radius:0;overflow:auto}
 </style>
 </head>
 <body>
 <header>
-<h1>☾ Qurtuba Quest</h1>
-<button id="logout" class="secondary hidden">Logout</button>
+<button id="backBtn" class="secondary hidden" style="margin:0">←</button>
+<h1 id="title">☾ Qurtuba Quest</h1>
 </header>
 
 <main>
@@ -67,28 +88,63 @@ video{width:48%;max-height:240px;background:#202c33}
 </section>
 
 <div id="app" class="hidden">
-<section>
-<h2>My Account</h2>
-<p>Username: <b id="myName"></b></p>
-</section>
 
-<section>
-<h2>Add Contact</h2>
-<input id="friendUsername" placeholder="Friend's username">
-<input id="friendName" maxlength="40" placeholder="Name to save, e.g. Rahim">
-<button id="addContact">＋ Add Contact</button>
-<p id="contactStatus"></p>
-</section>
+<!-- HOME -->
+<div id="home">
+<p class="muted center">Signed in as <b id="myName"></b></p>
+<div id="tiles">
+<button class="tile t1" data-go="chat">
+<svg viewBox="0 0 24 24"><path d="M5 3h14a3 3 0 013 3v9a3 3 0 01-3 3h-8l-5 4v-4H5a3 3 0 01-3-3V6a3 3 0 013-3z" fill="#fff"/><circle cx="8" cy="10.5" r="1.4" fill="currentColor"/><circle cx="12" cy="10.5" r="1.4" fill="currentColor"/><circle cx="16" cy="10.5" r="1.4" fill="currentColor"/></svg>
+Messages</button>
+<button class="tile t2" data-go="call">
+<svg viewBox="0 0 24 24"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25c1.1.37 2.3.57 3.6.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1z"/></svg>
+Voice Call</button>
+<button class="tile t3" data-go="video">
+<svg viewBox="0 0 24 24"><rect x="2" y="6" width="13" height="12" rx="3" fill="#fff"/><path d="M17 10l5-3.5v11L17 14z" fill="#fff"/></svg>
+Video Call</button>
+<button class="tile t4" data-go="add">
+<svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="4" fill="#fff"/><path d="M2 21c0-4 3.5-6 8-6s8 2 8 6z" fill="#fff"/><path d="M19 6v6M16 9h6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+Add Contact</button>
+</div>
+</div>
 
-<section>
-<h2>Search Saved Contacts</h2>
+<!-- LIST (chat / call / video / add / profile) -->
+<section id="listView" class="hidden">
 <input id="search" placeholder="Search by name or username">
-<div id="contacts"></div>
+<p id="listStatus" class="muted"></p>
+<div id="listBox"></div>
 </section>
 
+<!-- SETTINGS -->
+<div id="settings" class="hidden">
+<section>
+<h2>Account</h2>
+<p>Username: <b id="accName"></b><br><small id="accEmail"></small></p>
+<input id="newUsername" maxlength="20" placeholder="New username">
+<button id="saveNewName">Change Username</button>
+</section>
+<section>
+<h2>Change Password</h2>
+<input id="curPass" type="password" placeholder="Current password" autocomplete="current-password">
+<input id="newPass" type="password" placeholder="New password (min 6 characters)" autocomplete="new-password">
+<button id="savePass">Change Password</button>
+</section>
+<section>
+<h2>Session</h2>
+<button id="logout" class="secondary">Logout</button>
+</section>
+<section>
+<h2 style="color:#e74c5b">Delete Account</h2>
+<p class="muted">Your account, username, contacts and sent messages will be deleted permanently.</p>
+<input id="delPass" type="password" placeholder="Enter password to confirm" autocomplete="current-password">
+<button id="deleteAcc" class="danger">Delete My Account</button>
+<p id="setStatus"></p>
+</section>
+</div>
+<!-- CHAT -->
 <section id="chat" class="hidden">
 <div class="row" style="justify-content:space-between">
-<div><h2 id="chatName">Chat</h2><small id="chatUsername"></small></div>
+<div><h2 id="chatName" style="margin:0">Chat</h2><small id="chatUsername"></small></div>
 <button id="back" class="secondary">Back</button>
 </div>
 <div class="row">
@@ -103,6 +159,7 @@ video{width:48%;max-height:240px;background:#202c33}
 </form>
 </section>
 
+<!-- CALL -->
 <section id="callBox" class="hidden">
 <h2 id="callTitle">Call</h2>
 <p id="callStatus">Connecting…</p>
@@ -113,6 +170,16 @@ video{width:48%;max-height:240px;background:#202c33}
 <button id="answer" class="hidden">Answer</button>
 <button id="endCall" class="danger">End Call</button>
 </section>
+
+<!-- BOTTOM BAR -->
+<nav id="nav">
+<button id="navProfile" data-go="profile">
+<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.6"/><path d="M2 20c0-3.8 3-6 7-6s7 2.2 7 6z"/><circle cx="17.5" cy="8.8" r="2.6"/><path d="M18 14.3c2.5.2 4 1.8 4 4.2v1.5h-4.3c0-2-.5-4-1.3-4.9.5-.5 1-.8 1.6-.8z"/></svg>
+Contacts</button>
+<button id="navSettings" data-go="settings">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+Settings</button>
+</nav>
 </div>
 </main>
 
@@ -134,17 +201,17 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
+const TS = firebase.database.ServerValue.TIMESTAMP;
 const $ = id => document.getElementById(id);
 
 let me = null, myUsername = "", contacts = {}, selected = null;
+let members = {}, uidName = {}, mode = "home";
 let msgRefs = [], callRef = null, pc = null, stream = null;
 let callRole = "", incomingId = null, callType = "voice";
-let inboxRef = null;
+let inboxRef = null, contactRef = null, membersRef = null;
 
-// TURN server যোগ করলে ভিন্ন নেটওয়ার্কে কল আরও ভালো চলবে।
-const rtcConfig = {
-  iceServers: [{urls:"stun:stun.l.google.com:19302"}]
-};
+// ভিন্ন নেটওয়ার্কে কল চালাতে TURN server লাগতে পারে।
+const rtcConfig = { iceServers: [{urls:"stun:stun.l.google.com:19302"}] };
 
 function show(id, yes) { $(id).classList.toggle("hidden", !yes); }
 function say(id, text) { $(id).textContent = text || ""; }
@@ -156,6 +223,33 @@ function err(e) {
     : (e.message || "Something went wrong.");
 }
 
+/* ---------- Navigation ---------- */
+const TITLES = {home:"☾ Qurtuba Quest", chat:"Messages", call:"Voice Call", video:"Video Call",
+  add:"Add Contact", profile:"My Contacts", settings:"Settings"};
+const LIST_MODES = ["chat","call","video","add","profile"];
+
+function go(m) {
+  mode = m;
+  show("home", m === "home");
+  show("listView", LIST_MODES.includes(m));
+  show("settings", m === "settings");
+  show("backBtn", m !== "home");
+  say("title", TITLES[m]);
+  $("navProfile").classList.toggle("on", m === "profile");
+  $("navSettings").classList.toggle("on", m === "settings");
+  $("search").value = "";
+  say("listStatus", ""); say("setStatus", "");
+  if (m === "settings") {
+    say("accName", "@" + myUsername);
+    say("accEmail", me ? me.email : "");
+  }
+  renderList();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+$("backBtn").onclick = () => go("home");
+
+/* ---------- Auth ---------- */
 $("login").onclick = async () => {
   try {
     await auth.signInWithEmailAndPassword($("email").value.trim(), $("password").value);
@@ -176,171 +270,256 @@ $("signup").onclick = async () => {
       say("profileStatus", "নতুন Account! এবার নিজের Username তৈরি করো।");
     }
   } catch (e) {
-    if (e.code === "auth/email-already-in-use") {
+    if (e.code === "auth/email-already-in-use")
       say("status", "এই Gmail দিয়ে Account আগে থেকেই আছে। নতুন Gmail ব্যবহার করো অথবা Login করো।");
-    } else {
-      say("status", err(e));
-    }
+    else say("status", err(e));
   }
 };
-
 $("logout").onclick = async () => {
   await endCall(true);
   await auth.signOut();
 };
 
+function stopWatchers() {
+  cleanupMessages(); stopInbox();
+  if (contactRef) { contactRef.off(); contactRef = null; }
+  if (membersRef) { membersRef.off(); membersRef = null; }
+}
+
+function startApp() {
+  say("myName", "@" + myUsername);
+  show("profile", false); show("app", true);
+  go("home");
+  watchContacts(); watchMembers(); watchIncomingCalls();
+}
+
 auth.onAuthStateChanged(async user => {
-  cleanupMessages();
-  stopInbox();
+  stopWatchers();
   me = user;
   if (!user) {
-    myUsername = ""; contacts = {}; selected = null;
-    show("auth",true); show("profile",false);
-    show("app",false); show("logout",false);
+    myUsername = ""; contacts = {}; members = {}; uidName = {}; selected = null;
+    show("chat", false); $("chat").classList.remove("chat-screen");
+    show("auth",true); show("profile",false); show("app",false);
     return;
   }
-  show("auth",false); show("logout",true);
+  show("auth",false);
   try {
     const snap = await db.ref("users/"+user.uid).once("value");
     const profile = snap.val();
-    if (!profile || !profile.username) {
-      show("profile",true); show("app",false);
-      return;
-    }
+    if (!profile || !profile.username) { show("profile",true); show("app",false); return; }
     myUsername = profile.username;
-    say("myName","@"+myUsername);
-    show("profile",false); show("app",true);
-    watchContacts();
-    watchIncomingCalls();
-  } catch(e) {
-    show("profile",true); say("profileStatus",err(e));
-  }
+    startApp();
+  } catch(e) { show("profile",true); say("profileStatus",err(e)); }
 });
 
 $("saveUsername").onclick = async () => {
   if (!me) return;
   const username = norm($("username").value);
   if (!validUsername(username)) {
-    say("profileStatus","Use 3–20 lowercase letters, numbers or underscores.");
-    return;
+    say("profileStatus","Use 3–20 lowercase letters, numbers or underscores."); return;
   }
   $("saveUsername").disabled = true;
   try {
-    const ref = db.ref("usernames/"+username);
-    const result = await ref.transaction(v => v === null ? me.uid : undefined);
-    if (!result.committed || result.snapshot.val() !== me.uid) {
-      say("profileStatus","Username already taken. Try another.");
-      return;
+    const r = await db.ref("usernames/"+username).transaction(v => v === null ? me.uid : undefined);
+    if (!r.committed || r.snapshot.val() !== me.uid) {
+      say("profileStatus","Username already taken. Try another."); return;
     }
     await db.ref("users/"+me.uid).set({username});
     myUsername = username;
-    say("myName","@"+username);
-    show("profile",false); show("app",true);
-    watchContacts(); watchIncomingCalls();
+    startApp();
   } catch(e) { say("profileStatus",err(e)); }
   finally { $("saveUsername").disabled = false; }
 };
 
-$("addContact").onclick = async () => {
-  if (!me) return;
-  const username = norm($("friendUsername").value);
-  const name = $("friendName").value.trim();
-  if (!validUsername(username)) { say("contactStatus","Enter a valid username."); return; }
-  if (!name || name.length > 40) { say("contactStatus","Name must be 1–40 characters."); return; }
-  $("addContact").disabled = true;
-  try {
-    const snap = await db.ref("usernames/"+username).once("value");
-    if (!snap.exists()) { say("contactStatus","Username not found."); return; }
-    const uid = snap.val();
-    if (uid === me.uid) { say("contactStatus","You cannot add yourself."); return; }
-    await db.ref("contacts/"+me.uid+"/"+uid).set({
-      name, username, addedAt: firebase.database.ServerValue.TIMESTAMP
-    });
-    $("friendUsername").value = "";
-    $("friendName").value = "";
-    say("contactStatus","Contact saved successfully.");
-  } catch(e) { say("contactStatus",err(e)); }
-  finally { $("addContact").disabled = false; }
-};
-
-let contactRef = null;
+/* ---------- Contacts & members ---------- */
 function watchContacts() {
   if (!me) return;
   if (contactRef) contactRef.off();
   contactRef = db.ref("contacts/"+me.uid);
   contactRef.on("value", snap => {
     contacts = snap.val() || {};
-    renderContacts();
-    watchIncomingCalls(); // contacts লোড হওয়ার পর আবার চেক
+    renderList();
+    watchIncomingCalls();
     if (selected && !contacts[selected]) clearChat();
-  }, e => say("contactStatus",err(e)));
+  }, e => say("listStatus",err(e)));
 }
 
-$("search").oninput = renderContacts;
-function renderContacts() {
-  const list = $("contacts");
-  list.replaceChildren();
+function watchMembers() {
+  if (!me) return;
+  if (membersRef) membersRef.off();
+  membersRef = db.ref("usernames");
+  membersRef.on("value", snap => {
+    members = snap.val() || {};
+    uidName = {};
+    for (const [u, id] of Object.entries(members)) uidName[id] = u;
+    renderList();
+  }, e => say("listStatus",err(e)));
+}
+
+$("search").oninput = renderList;
+
+function button(label, cls, fn) {
+  const b = document.createElement("button");
+  b.textContent = label; if (cls) b.className = cls;
+  b.onclick = ev => { ev.stopPropagation(); fn(b); };
+  return b;
+}
+
+function renderList() {
+  if (!me || !LIST_MODES.includes(mode)) return;
+  const box = $("listBox");
+  box.replaceChildren();
   const q = norm($("search").value);
-  const items = Object.entries(contacts).filter(([uid,c]) =>
-    (c.name||"").toLowerCase().includes(q) ||
-    (c.username||"").toLowerCase().includes(q)
-  );
+
+  let items;
+  if (mode === "add") {
+    items = Object.entries(members).filter(([u, uid]) => uid !== me.uid)
+      .map(([u, uid]) => ({uid, name: u, username: u}));
+  } else {
+    items = Object.entries(contacts).map(([uid, c]) => {
+      const username = uidName[uid] || c.username || "";
+      return {uid, name: c.name || username, username};
+    });
+  }
+  items = items.filter(i => i.name.toLowerCase().includes(q) || i.username.toLowerCase().includes(q));
+  items.sort((a, b) => a.name.localeCompare(b.name));
+
   if (!items.length) {
     const p = document.createElement("p");
     p.className = "muted";
-    p.textContent = q ? "No matching saved contacts." : "No saved contacts yet.";
-    list.appendChild(p);
+    p.textContent = mode === "add" ? "No members found."
+      : q ? "No matching contacts." : "No contacts yet. Tap the Add Contact icon on Home.";
+    box.appendChild(p);
+    return;
   }
-  for (const [uid,c] of items) {
-    const b = document.createElement("button");
-    b.className = uid === selected ? "active" : "";
-    b.textContent = (c.name||c.username)+"  (@"+(c.username||"")+")";
-    b.onclick = () => openChat(uid);
-    list.appendChild(b);
-    const remove = document.createElement("button");
-    remove.className = "secondary";
-    remove.textContent = "Remove";
-    remove.onclick = async () => {
-      if (!confirm("Remove this contact?")) return;
-      try {
-        if (selected === uid) clearChat();
-        await db.ref("contacts/"+me.uid+"/"+uid).remove();
-      } catch(e) { say("contactStatus",err(e)); }
-    };
-    list.appendChild(remove);
+  for (const i of items) {
+    const row = document.createElement("div");
+    row.className = "item" + (mode === "chat" ? " click" : "");
+    const av = document.createElement("div");
+    av.className = "av"; av.textContent = (i.name[0] || "?").toUpperCase();
+    const info = document.createElement("div");
+    info.className = "info";
+    const b = document.createElement("b"); b.textContent = i.name;
+    const s = document.createElement("small"); s.textContent = "@" + i.username;
+    info.append(b, s);
+    row.append(av, info);
+
+    if (mode === "chat") {
+      row.onclick = () => openChat(i.uid);
+      row.appendChild(button("Chat", "", () => openChat(i.uid)));
+    } else if (mode === "call") {
+      row.appendChild(button("☎ Call", "", () => startCall("voice", i.uid)));
+    } else if (mode === "video") {
+      row.appendChild(button("▣ Video", "", () => startCall("video", i.uid)));
+    } else if (mode === "add") {
+      if (contacts[i.uid]) {
+        const added = button("Added ✓", "secondary", () => {}); added.disabled = true;
+        row.appendChild(added);
+      } else row.appendChild(button("＋ Add", "", () => addMember(i.uid, i.username)));
+    } else if (mode === "profile") {
+      row.appendChild(button("Remove", "danger", async () => {
+        if (!confirm("Remove " + i.name + " from contacts?")) return;
+        try {
+          if (selected === i.uid) clearChat();
+          await db.ref("contacts/"+me.uid+"/"+i.uid).remove();
+        } catch(e) { say("listStatus", err(e)); }
+      }));
+    }
+    box.appendChild(row);
   }
 }
+
+async function addMember(uid, username) {
+  const name = (prompt("Save this contact as:", username) || "").trim();
+  if (!name) return;
+  if (name.length > 40) { say("listStatus", "Name must be 1–40 characters."); return; }
+  try {
+    await db.ref("contacts/"+me.uid+"/"+uid).set({name, username, addedAt: TS});
+    say("listStatus", name + " added to your contacts.");
+  } catch(e) { say("listStatus", err(e)); }
+}
+
+/* ---------- Settings ---------- */
+$("saveNewName").onclick = async () => {
+  const u = norm($("newUsername").value);
+  if (!validUsername(u)) { say("setStatus", "Use 3–20 lowercase letters, numbers or underscores."); return; }
+  if (u === myUsername) { say("setStatus", "This is already your username."); return; }
+  $("saveNewName").disabled = true;
+  try {
+    const old = myUsername;
+    const r = await db.ref("usernames/"+u).transaction(v => v === null ? me.uid : undefined);
+    if (!r.committed || r.snapshot.val() !== me.uid) { say("setStatus", "Username already taken."); return; }
+    await db.ref("users/"+me.uid).set({username: u});
+    await db.ref("usernames/"+old).remove();
+    myUsername = u;
+    say("myName", "@" + u); say("accName", "@" + u);
+    $("newUsername").value = "";
+    say("setStatus", "Username changed.");
+  } catch(e) { say("setStatus", err(e)); }
+  finally { $("saveNewName").disabled = false; }
+};
+
+async function reauth(password) {
+  if (!password) throw new Error("Password লিখো।");
+  const cred = firebase.auth.EmailAuthProvider.credential(me.email, password);
+  await me.reauthenticateWithCredential(cred);
+}
+
+$("savePass").onclick = async () => {
+  const np = $("newPass").value;
+  if (np.length < 6) { say("setStatus", "New password must be at least 6 characters."); return; }
+  try {
+    await reauth($("curPass").value);
+    await me.updatePassword(np);
+    $("curPass").value = ""; $("newPass").value = "";
+    say("setStatus", "Password changed.");
+  } catch(e) { say("setStatus", err(e)); }
+};
+
+$("deleteAcc").onclick = async () => {
+  if (!confirm("Delete your account permanently? This cannot be undone.")) return;
+  try {
+    await reauth($("delPass").value);
+    const user = me, uid = me.uid, name = myUsername;
+    await endCall(true);
+    stopWatchers();
+    await db.ref("messages/"+uid).remove();
+    await db.ref("calls/"+uid).remove();
+    await db.ref("contacts/"+uid).remove();
+    await db.ref("usernames/"+name).remove();
+    await db.ref("users/"+uid).remove();
+    await user.delete();
+  } catch(e) {
+    say("setStatus", err(e));
+    if (me) { watchContacts(); watchMembers(); watchIncomingCalls(); }
+  }
+};
+
+/* ---------- Chat ---------- */
 function openChat(uid) {
   if (!contacts[uid]) return;
   cleanupMessages();
   selected = uid;
-  say("chatName", contacts[uid].name || contacts[uid].username);
-  say("chatUsername", "@" + contacts[uid].username);
+  const c = contacts[uid];
+  say("chatName", c.name || uidName[uid] || c.username);
+  say("chatUsername", "@" + (uidName[uid] || c.username));
   say("chatStatus", "");
   $("messages").replaceChildren();
   $("message").value = "";
   show("chat", true);
   $("chat").classList.add("chat-screen");
-  renderContacts();
   loadMessages(uid);
 }
 
-$("back").onclick = () => {
+function closeChat() {
   cleanupMessages();
   show("chat", false);
   $("chat").classList.remove("chat-screen");
   selected = null;
   $("message").value = "";
-  renderContacts();
-};
-
-function clearChat() {
-  cleanupMessages();
-  selected = null;
-  show("chat", false);
-  $("chat").classList.remove("chat-screen");
-  renderContacts();
 }
+$("back").onclick = closeChat;
+function clearChat() { closeChat(); }
 
 function cleanupMessages() {
   msgRefs.forEach(ref => ref.off());
@@ -378,7 +557,6 @@ function loadMessages(peer) {
     ref.on("child_removed",snap => { all.delete(from+":"+snap.key); render(); });
   });
 }
-
 $("sendForm").onsubmit = async e => {
   e.preventDefault();
   if (!me || !selected || !contacts[selected]) return;
@@ -387,8 +565,7 @@ $("sendForm").onsubmit = async e => {
   $("message").value = "";
   try {
     await db.ref("messages/"+me.uid+"/"+selected).push({
-      senderId:me.uid, recipientId:selected, text,
-      timestamp:firebase.database.ServerValue.TIMESTAMP
+      senderId:me.uid, recipientId:selected, text, timestamp:TS
     });
     say("chatStatus","");
   } catch(e2) {
@@ -397,28 +574,23 @@ $("sendForm").onsubmit = async e => {
   }
 };
 
-/* ============ WebRTC calls ============
-   Call data path: calls/{receiverUid}/{callId}
-   প্রত্যেকে শুধু নিজের inbox (calls/{myUid}) শোনে।
+/* ---------- WebRTC calls ----------
+   Call path: calls/{receiverUid}/{callId}
    দুজনকেই একে অপরকে contact হিসেবে save করতে হবে। */
 
-function stopInbox() {
-  if (inboxRef) { inboxRef.off(); inboxRef = null; }
-}
+function stopInbox() { if (inboxRef) { inboxRef.off(); inboxRef = null; } }
 
 function watchIncomingCalls() {
   if (!me) return;
   stopInbox();
   inboxRef = db.ref("calls/" + me.uid);
-  inboxRef.on("child_added", onIncomingCall,
-    e => say("contactStatus", "Incoming call error: " + err(e)));
+  inboxRef.on("child_added", onIncomingCall, e => console.error("Incoming call error:", e));
   inboxRef.on("child_changed", onIncomingCall);
 }
 
 function onIncomingCall(snap) {
   const c = snap.val();
   if (!c || c.receiverId !== me?.uid || c.status !== "ringing") return;
-  // পুরোনো (৯০ সেকেন্ডের বেশি) ringing call উপেক্ষা করো
   if (c.createdAt && Date.now() - c.createdAt > 90000) return;
   if (!contacts[c.callerId]) return;
   if (incomingId === snap.key || callRef) return;
@@ -434,7 +606,6 @@ function onIncomingCall(snap) {
   show("callBox", true); show("answer", true);
   $("answer").onclick = () => answerCall(snap.key, c);
 
-  // কলার answer করার আগেই কেটে দিলে বন্ধ করো
   ref.child("status").on("value", s => {
     if (callRef === ref && s.val() === "ended") endCall(false);
   });
@@ -443,17 +614,14 @@ function onIncomingCall(snap) {
 function newPeer() {
   pc = new RTCPeerConnection(rtcConfig);
   const peer = pc;
-  const pendingCandidates = [];
+  const pending = [];
 
-  peer.ontrack = e => {
-    if (e.streams[0]) $("remoteVideo").srcObject = e.streams[0];
-  };
+  peer.ontrack = e => { if (e.streams[0]) $("remoteVideo").srcObject = e.streams[0]; };
 
   peer.onicecandidate = e => {
     if (e.candidate && callRef) {
       const path = callRole === "caller" ? "callerCandidates" : "calleeCandidates";
-      callRef.child(path).push(e.candidate.toJSON())
-        .catch(er => console.warn("ICE save error:", er));
+      callRef.child(path).push(e.candidate.toJSON()).catch(er => console.warn("ICE save error:", er));
     }
   };
 
@@ -461,15 +629,15 @@ function newPeer() {
   callRef.child(remotePath).on("child_added", async snap => {
     if (!snap.val() || pc !== peer) return;
     try {
-      const candidate = new RTCIceCandidate(snap.val());
-      if (peer.remoteDescription) await peer.addIceCandidate(candidate);
-      else pendingCandidates.push(candidate);
+      const cand = new RTCIceCandidate(snap.val());
+      if (peer.remoteDescription) await peer.addIceCandidate(cand);
+      else pending.push(cand);
     } catch (e) { console.warn("ICE candidate error:", e); }
   });
 
   peer.flushPendingCandidates = async () => {
-    while (pendingCandidates.length && peer.remoteDescription) {
-      try { await peer.addIceCandidate(pendingCandidates.shift()); }
+    while (pending.length && peer.remoteDescription) {
+      try { await peer.addIceCandidate(pending.shift()); }
       catch (e) { console.warn("ICE candidate error:", e); }
     }
   };
@@ -480,21 +648,18 @@ function newPeer() {
     else if (peer.connectionState === "failed")
       say("callStatus", "Connection failed. A TURN server may be needed.");
   };
-
   return peer;
 }
 
-async function startCall(type) {
-  if (!me || !selected || !contacts[selected]) return;
-  const receiverId = selected;
+async function startCall(type, uid) {
+  if (!me || !uid || !contacts[uid]) return;
+  const receiverId = uid;
 
   try {
     await endCall(false);
     callType = type;
 
-    const localStream = await navigator.mediaDevices.getUserMedia({
-      audio: true, video: type === "video"
-    });
+    const localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === "video" });
     stream = localStream;
 
     $("localVideo").srcObject = localStream;
@@ -502,24 +667,20 @@ async function startCall(type) {
     $("remoteVideo").srcObject = null;
     $("remoteVideo").classList.toggle("hidden", type !== "video");
 
-    // Call receiver-এর inbox-এ তৈরি হয়
     const ref = db.ref("calls/" + receiverId).push();
     callRef = ref;
     callRole = "caller";
 
     const peer = newPeer();
-    localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+    localStream.getTracks().forEach(t => peer.addTrack(t, localStream));
 
     const offer = await peer.createOffer();
     await peer.setLocalDescription(offer);
 
     await ref.set({
-      callerId: me.uid,
-      receiverId,
-      type,
+      callerId: me.uid, receiverId, type,
       offer: { type: offer.type, sdp: offer.sdp },
-      status: "ringing",
-      createdAt: firebase.database.ServerValue.TIMESTAMP
+      status: "ringing", createdAt: TS
     });
 
     ref.child("answer").on("value", async snap => {
@@ -539,19 +700,20 @@ async function startCall(type) {
       else if (snap.val() === "active") say("callStatus", "Call answered. Connecting…");
     });
 
-    say("callTitle", "Calling " + (contacts[receiverId].name || contacts[receiverId].username));
+    const c = contacts[receiverId];
+    say("callTitle", "Calling " + (c.name || c.username));
     say("callStatus", "Ringing…");
     show("answer", false);
     show("callBox", true);
 
   } catch (e) {
-    say("chatStatus", "Call failed: " + err(e));
     await endCall(false);
+    alert("Call failed: " + err(e));
   }
 }
-  async function answerCall(id, c) {
-  const ref = db.ref("calls/" + me.uid + "/" + id);
 
+async function answerCall(id, c) {
+  const ref = db.ref("calls/" + me.uid + "/" + id);
   try {
     if (!me || !contacts[c.callerId]) throw new Error("Add this caller to your contacts first.");
 
@@ -561,9 +723,7 @@ async function startCall(type) {
     callRole = "callee";
     callType = c.type || "voice";
 
-    const localStream = await navigator.mediaDevices.getUserMedia({
-      audio: true, video: callType === "video"
-    });
+    const localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: callType === "video" });
     stream = localStream;
 
     $("localVideo").srcObject = localStream;
@@ -572,12 +732,11 @@ async function startCall(type) {
     $("remoteVideo").classList.toggle("hidden", callType !== "video");
 
     const peer = newPeer();
-    localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+    localStream.getTracks().forEach(t => peer.addTrack(t, localStream));
 
     const latest = await ref.once("value");
     const call = latest.val();
-    if (!call || call.status !== "ringing" || !call.offer)
-      throw new Error("This call is no longer available.");
+    if (!call || call.status !== "ringing" || !call.offer) throw new Error("This call is no longer available.");
 
     await peer.setRemoteDescription(new RTCSessionDescription(call.offer));
     await peer.flushPendingCandidates();
@@ -605,48 +764,32 @@ async function startCall(type) {
 }
 
 async function endCall(writeStatus = true) {
-  const ref = callRef;
-  const peer = pc;
-  const localStream = stream;
-
-  callRef = null;
-  pc = null;
-  stream = null;
-  callRole = "";
+  const ref = callRef, peer = pc, localStream = stream;
+  callRef = null; pc = null; stream = null; callRole = "";
 
   if (writeStatus && ref) {
     try { await ref.child("status").set("ended"); }
     catch (e) { console.warn("Could not update call status:", e); }
   }
-
   if (ref) {
-    ref.child("answer").off();
-    ref.child("status").off();
-    ref.child("callerCandidates").off();
-    ref.child("calleeCandidates").off();
+    ref.child("answer").off(); ref.child("status").off();
+    ref.child("callerCandidates").off(); ref.child("calleeCandidates").off();
   }
-
   if (peer) {
-    peer.ontrack = null;
-    peer.onicecandidate = null;
-    peer.onconnectionstatechange = null;
+    peer.ontrack = null; peer.onicecandidate = null; peer.onconnectionstatechange = null;
     peer.close();
   }
-
-  if (localStream) localStream.getTracks().forEach(track => track.stop());
+  if (localStream) localStream.getTracks().forEach(t => t.stop());
 
   $("localVideo").srcObject = null;
   $("remoteVideo").srcObject = null;
-
   show("callBox", false);
   show("answer", false);
-  // incomingId রেখে দিই, যাতে একই call আবার বেজে না ওঠে
 }
 
-$("voice").onclick = () => startCall("voice");
-$("videoCall").onclick = () => startCall("video");
+$("voice").onclick = () => startCall("voice", selected);
+$("videoCall").onclick = () => startCall("video", selected);
 $("endCall").onclick = () => endCall(true);
 </script>
 </body>
 </html>
-
