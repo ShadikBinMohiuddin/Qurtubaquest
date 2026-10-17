@@ -476,11 +476,20 @@ $("sendForm").onsubmit = async e => {
 };
 
 // WebRTC calls: both users must save each other as contacts in this MVP.
+
 function watchIncomingCalls() {
   if (!me) return;
-  db.ref("calls").off("child_added", onIncomingCall);
-  db.ref("calls").on("child_added", onIncomingCall);
+
+  const callsRef = db.ref("calls");
+
+  callsRef.off("child_added", onIncomingCall);
+
+  callsRef.on("child_added", onIncomingCall, error => {
+    console.error("Incoming calls listener error:", error);
+    say("chatStatus", "Incoming call error: " + error.message);
+  });
 }
+
 function onIncomingCall(snap) {
   const c = snap.val();
   if (!c || c.receiverId !== me?.uid || c.status !== "ringing") return;
