@@ -42,10 +42,11 @@ small,.muted{color:#aebac1}
 .info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Bottom bar */
-#nav{position:fixed;left:0;right:0;bottom:0;z-index:500;background:#202c33;display:flex;justify-content:space-between;padding:8px 36px calc(8px + env(safe-area-inset-bottom));border-top:1px solid #35434b}
-#nav button{background:none;color:#aebac1;margin:0;padding:8px 16px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px}
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:500;background:#202c33;display:flex;justify-content:space-between;padding:8px 18px calc(8px + env(safe-area-inset-bottom));border-top:1px solid #35434b}
+#nav button{position:relative;background:none;color:#aebac1;margin:0;padding:8px 16px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px}
 #nav button.on{color:#25d366}
 #nav svg{width:28px;height:28px}
+.badge{position:absolute;top:0;right:4px;background:#e74c5b;color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:11px;display:grid;place-items:center;padding:0 5px}
 
 /* Chat */
 #messages{height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:8px;background:#0b141a;border-radius:8px}
@@ -108,7 +109,6 @@ Video Call</button>
 Add Contact</button>
 </div>
 </div>
-
 <!-- LIST (chat / call / video / add / profile) -->
 <section id="listView" class="hidden">
 <input id="search" placeholder="Search by name or username">
@@ -178,6 +178,10 @@ Add Contact</button>
 <button id="navProfile" data-go="profile">
 <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.6"/><path d="M2 20c0-3.8 3-6 7-6s7 2.2 7 6z"/><circle cx="17.5" cy="8.8" r="2.6"/><path d="M18 14.3c2.5.2 4 1.8 4 4.2v1.5h-4.3c0-2-.5-4-1.3-4.9.5-.5 1-.8 1.6-.8z"/></svg>
 Contacts</button>
+<button id="navRequests" data-go="requests">
+<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="10" cy="8" r="4"/><path d="M2 21c0-4 3.5-6 8-6s8 2 8 6z"/><path d="M19 4v6M16 7h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+<span id="reqBadge" class="badge hidden">0</span>
+Requests</button>
 <button id="navSettings" data-go="settings">
 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
 Settings</button>
@@ -199,7 +203,8 @@ const firebaseConfig = {
   messagingSenderId: "138703537259",
   appId: "1:138703537259:web:2af20c2b6d5d4567199d2e"
 };
-  firebase.initializeApp(firebaseConfig);
+
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 const TS = firebase.database.ServerValue.TIMESTAMP;
@@ -210,7 +215,7 @@ let members = {}, uidName = {}, mode = "home";
 let msgRefs = [], callRef = null, pc = null, stream = null;
 let callRole = "", incomingId = null, callType = "voice";
 let inboxRef = null, contactRef = null, membersRef = null;
-
+let requests = {}, sentReq = {}, reqRef = null, sentRef = null;
 // ভিন্ন নেটওয়ার্কে কল চালাতে TURN server লাগতে পারে।
 const rtcConfig = { iceServers: [{urls:"stun:stun.l.google.com:19302"}] };
 
@@ -226,8 +231,8 @@ function err(e) {
 
 /* ---------- Navigation ---------- */
 const TITLES = {home:"☾ Vynqora", chat:"Messages", call:"Voice Call", video:"Video Call",
-  add:"Add Contact", profile:"My Contacts", settings:"Settings"};
-const LIST_MODES = ["chat","call","video","add","profile"];
+  add:"Add Contact", profile:"My Contacts", requests:"Friend Requests", settings:"Settings"};
+const LIST_MODES = ["chat","call","video","add","profile","requests"];
 
 function go(m) {
   mode = m;
@@ -237,6 +242,7 @@ function go(m) {
   show("backBtn", m !== "home");
   say("title", TITLES[m]);
   $("navProfile").classList.toggle("on", m === "profile");
+  $("navRequests").classList.toggle("on", m === "requests");
   $("navSettings").classList.toggle("on", m === "settings");
   $("search").value = "";
   say("listStatus", ""); say("setStatus", "");
@@ -300,13 +306,15 @@ function stopWatchers() {
   cleanupMessages(); stopInbox();
   if (contactRef) { contactRef.off(); contactRef = null; }
   if (membersRef) { membersRef.off(); membersRef = null; }
+  if (reqRef) { reqRef.off(); reqRef = null; }
+  if (sentRef) { sentRef.off(); sentRef = null; }
 }
 
 function startApp() {
   say("myName", "@" + myUsername);
   show("profile", false); show("app", true);
   go("home");
-  watchContacts(); watchMembers(); watchIncomingCalls();
+  watchContacts(); watchMembers(); watchRequests(); watchIncomingCalls();
 }
 
 auth.onAuthStateChanged(async user => {
@@ -314,6 +322,7 @@ auth.onAuthStateChanged(async user => {
   me = user;
   if (!user) {
     myUsername = ""; contacts = {}; members = {}; uidName = {}; selected = null;
+    requests = {}; sentReq = {}; updateBadge();
     show("chat", false); $("chat").classList.remove("chat-screen");
     show("auth",true); show("profile",false); show("app",false);
     return;
@@ -346,7 +355,7 @@ $("saveUsername").onclick = async () => {
   } catch(e) { say("profileStatus",err(e)); }
   finally { $("saveUsername").disabled = false; }
 };
-  
+
 /* ---------- Contacts & members ---------- */
 function watchContacts() {
   if (!me) return;
@@ -355,6 +364,7 @@ function watchContacts() {
   contactRef.on("value", snap => {
     contacts = snap.val() || {};
     renderList();
+    applySentNames();
     watchIncomingCalls();
     if (selected && !contacts[selected]) clearChat();
   }, e => say("listStatus",err(e)));
@@ -388,7 +398,12 @@ function renderList() {
   const q = norm($("search").value);
 
   let items;
-  if (mode === "add") {
+  if (mode === "requests") {
+    items = Object.entries(requests).map(([uid, r]) => {
+      const u = uidName[uid] || r.username || "";
+      return {uid, name: u, username: u};
+    });
+  } else if (mode === "add") {
     items = Object.entries(members).filter(([u, uid]) => uid !== me.uid)
       .map(([u, uid]) => ({uid, name: u, username: u}));
   } else {
@@ -403,12 +418,12 @@ function renderList() {
   if (!items.length) {
     const p = document.createElement("p");
     p.className = "muted";
-    p.textContent = mode === "add" ? "No members found."
+    p.textContent = mode === "requests" ? "No friend requests right now."
+      : mode === "add" ? "No members found."
       : q ? "No matching contacts." : "No contacts yet. Tap the Add Contact icon on Home.";
     box.appendChild(p);
     return;
   }
-
   for (const i of items) {
     const row = document.createElement("div");
     row.className = "item" + (mode === "chat" ? " click" : "");
@@ -428,11 +443,18 @@ function renderList() {
       row.appendChild(button("☎ Call", "", () => startCall("voice", i.uid)));
     } else if (mode === "video") {
       row.appendChild(button("▣ Video", "", () => startCall("video", i.uid)));
+    } else if (mode === "requests") {
+      row.appendChild(button("Accept", "", () => acceptRequest(i.uid)));
+      row.appendChild(button("Reject", "danger", () => rejectRequest(i.uid)));
     } else if (mode === "add") {
       if (contacts[i.uid]) {
         const added = button("Added ✓", "secondary", () => {}); added.disabled = true;
         row.appendChild(added);
-      } else row.appendChild(button("＋ Add", "", () => addMember(i.uid, i.username)));
+      } else if (requests[i.uid]) {
+        row.appendChild(button("Accept", "", () => acceptRequest(i.uid)));
+      } else if (sentReq[i.uid]) {
+        row.appendChild(button("Cancel request", "secondary", () => cancelRequest(i.uid)));
+      } else row.appendChild(button("＋ Request", "", () => sendRequest(i.uid, i.username)));
     } else if (mode === "profile") {
       row.appendChild(button("Remove", "danger", async () => {
         if (!confirm("Remove " + i.name + " from contacts?")) return;
@@ -446,13 +468,77 @@ function renderList() {
   }
 }
 
-async function addMember(uid, username) {
+function updateBadge() {
+  const n = Object.keys(requests).length;
+  $("reqBadge").textContent = n;
+  show("reqBadge", n > 0);
+}
+
+function watchRequests() {
+  if (!me) return;
+  if (reqRef) reqRef.off();
+  if (sentRef) sentRef.off();
+  reqRef = db.ref("requests/" + me.uid);
+  reqRef.on("value", snap => {
+    requests = snap.val() || {};
+    updateBadge(); renderList();
+  }, e => say("listStatus", err(e)));
+  sentRef = db.ref("sent/" + me.uid);
+  sentRef.on("value", snap => {
+    sentReq = snap.val() || {};
+    renderList(); applySentNames();
+  }, e => say("listStatus", err(e)));
+}
+
+// অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
+function applySentNames() {
+  if (!me) return;
+  for (const [uid, v] of Object.entries(sentReq)) {
+    if (!contacts[uid]) continue;
+    const name = v && v.name;
+    const done = () => db.ref("sent/" + me.uid + "/" + uid).remove().catch(() => {});
+    if (name && contacts[uid].name !== name)
+      db.ref("contacts/" + me.uid + "/" + uid + "/name").set(name).then(done).catch(() => {});
+    else done();
+  }
+}
+
+async function sendRequest(uid, username) {
   const name = (prompt("Save this contact as:", username) || "").trim();
   if (!name) return;
   if (name.length > 40) { say("listStatus", "Name must be 1–40 characters."); return; }
   try {
-    await db.ref("contacts/"+me.uid+"/"+uid).set({name, username, addedAt: TS});
-    say("listStatus", name + " added to your contacts.");
+    await db.ref("requests/" + uid + "/" + me.uid).set({username: myUsername, createdAt: TS});
+    await db.ref("sent/" + me.uid + "/" + uid).set({name, createdAt: TS});
+    say("listStatus", "Request sent to @" + username + ".");
+  } catch(e) { say("listStatus", err(e)); }
+}
+
+async function cancelRequest(uid) {
+  try {
+    await db.ref("requests/" + uid + "/" + me.uid).remove();
+    await db.ref("sent/" + me.uid + "/" + uid).remove();
+    say("listStatus", "Request cancelled.");
+  } catch(e) { say("listStatus", err(e)); }
+}
+
+async function acceptRequest(uid) {
+  const uname = uidName[uid] || (requests[uid] && requests[uid].username) || "";
+  const name = (prompt("Save this contact as:", uname) || "").trim();
+  if (!name) return;
+  if (name.length > 40) { say("listStatus", "Name must be 1–40 characters."); return; }
+  try {
+    await db.ref("contacts/" + me.uid + "/" + uid).set({name, username: uname, addedAt: TS});
+    await db.ref("contacts/" + uid + "/" + me.uid).set({name: myUsername, username: myUsername, addedAt: TS});
+    await db.ref("requests/" + me.uid + "/" + uid).remove();
+    say("listStatus", "You and @" + uname + " are now contacts.");
+  } catch(e) { say("listStatus", err(e)); }
+}
+
+async function rejectRequest(uid) {
+  try {
+    await db.ref("requests/" + me.uid + "/" + uid).remove();
+    await db.ref("sent/" + uid + "/" + me.uid).remove();
   } catch(e) { say("listStatus", err(e)); }
 }
 
@@ -500,6 +586,12 @@ $("deleteAcc").onclick = async () => {
     const user = me, uid = me.uid, name = myUsername;
     await endCall(true);
     stopWatchers();
+    const rq = (await db.ref("requests/"+uid).once("value")).val() || {};
+    const st = (await db.ref("sent/"+uid).once("value")).val() || {};
+    for (const sender of Object.keys(rq)) await db.ref("sent/"+sender+"/"+uid).remove();
+    for (const rcv of Object.keys(st)) await db.ref("requests/"+rcv+"/"+uid).remove();
+    await db.ref("requests/"+uid).remove();
+    await db.ref("sent/"+uid).remove();
     await db.ref("messages/"+uid).remove();
     await db.ref("calls/"+uid).remove();
     await db.ref("contacts/"+uid).remove();
@@ -508,7 +600,7 @@ $("deleteAcc").onclick = async () => {
     await user.delete();
   } catch(e) {
     say("setStatus", err(e));
-    if (me) { watchContacts(); watchMembers(); watchIncomingCalls(); }
+    if (me) { watchContacts(); watchMembers(); watchRequests(); watchIncomingCalls(); }
   }
 };
 
@@ -542,7 +634,6 @@ function cleanupMessages() {
   msgRefs.forEach(ref => ref.off());
   msgRefs = [];
 }
-
   function loadMessages(peer) {
   const all = new Map();
   function render() {
@@ -780,8 +871,7 @@ async function answerCall(id, c) {
     await endCall(true);
   }
 }
-
-async function endCall(writeStatus = true) {
+  async function endCall(writeStatus = true) {
   const ref = callRef, peer = pc, localStream = stream;
   callRef = null; pc = null; stream = null; callRole = "";
 
