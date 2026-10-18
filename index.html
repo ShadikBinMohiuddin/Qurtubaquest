@@ -59,6 +59,7 @@ small,.muted{color:#aebac1}
 .item.unread{border-left:4px solid #25d366}
 .info small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .info small.unread-text{color:#25d366}
+.info small.missed{color:#ff6b78}
 .badge{position:absolute;top:0;right:4px;background:#e74c5b;color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:11px;display:grid;place-items:center;padding:0 5px}
 
 /* Chat */
@@ -74,7 +75,6 @@ small,.muted{color:#aebac1}
 .chat-bar h2{flex:1;min-width:0;margin:0;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chat-bar button{width:44px;height:44px;padding:0;margin:0;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
 .chat-bar svg{width:22px;height:22px}
-
 /* Call */
 video{width:48%;max-height:240px;background:#202c33}
 #callBox:not(.hidden){position:fixed;inset:0;z-index:2000;margin:0;border-radius:0;overflow:auto}
@@ -212,6 +212,7 @@ Settings</button>
 </nav>
 </div>
 </main>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -231,6 +232,9 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 const TS = firebase.database.ServerValue.TIMESTAMP;
+let serverOffset = 0;
+db.ref(".info/serverTimeOffset").on("value", s => { serverOffset = s.val() || 0; });
+function now() { return Date.now() + serverOffset; }
 const $ = id => document.getElementById(id);
 
 let me = null, myUsername = "", contacts = {}, selected = null;
@@ -310,7 +314,7 @@ $("signup").onclick = async () => {
     else say("status", err(e));
   }
 };
-
+  
 $("forgot").onclick = async () => {
   const email = $("email").value.trim();
   if (!email) { say("status", "আগে উপরে Email address লিখো, তারপর Forgot password চাপো।"); return; }
@@ -414,7 +418,7 @@ function watchMembers() {
     renderList();
   }, e => say("listStatus",err(e)));
 }
-  
+
 $("search").oninput = renderList;
 
 function button(label, cls, fn) {
@@ -446,9 +450,10 @@ function renderList() {
     });
   }
   items = items.filter(i => i.name.toLowerCase().includes(q) || i.username.toLowerCase().includes(q));
-  items.sort((a, b) =>
-    (mode === "chat" ? (unreadFor(b.uid) > 0) - (unreadFor(a.uid) > 0) : 0) ||
-    a.name.localeCompare(b.name));
+  const cntFor = uid => mode === "chat" ? unreadFor(uid)
+    : mode === "call" ? missedCount("voice", uid)
+    : mode === "video" ? missedCount("video", uid) : 0;
+  items.sort((a, b) => ((cntFor(b.uid) > 0) - (cntFor(a.uid) > 0)) || a.name.localeCompare(b.name));
 
   if (!items.length) {
     const p = document.createElement("p");
@@ -471,14 +476,18 @@ function renderList() {
     const s = document.createElement("small"); s.textContent = "@" + i.username;
     info.append(b, s);
     row.append(av, info);
-    const cnt = mode === "chat" ? unreadFor(i.uid)
-      : mode === "call" ? missedCount("voice", i.uid)
-      : mode === "video" ? missedCount("video", i.uid) : 0;
+    const cnt = cntFor(i.uid);
     if (cnt > 0) {
+      row.classList.add("unread");
       if (mode === "chat") {
-        row.classList.add("unread");
         s.textContent = lastMsg[i.uid] ? lastMsg[i.uid].text : "New message";
         s.className = "unread-text";
+      } else {
+        const type = mode === "call" ? "voice" : "video";
+        const lm = lastMissedCall(type, i.uid);
+        s.textContent = (lm && lm.status === "ringing" ? "Calling now" : "Missed " + type + " call") +
+          (lm ? " · " + fmtTime(lm.createdAt) : "");
+        s.className = "unread-text missed";
       }
       const pb = document.createElement("span");
       pb.className = "badge pill"; pb.textContent = cnt > 99 ? "99+" : cnt;
@@ -603,20 +612,30 @@ function unreadFor(peer) {
   return n;
 }
 
-function isMissed(c) {
+// আমার কাছে আসা call, যেটা আমি ধরিনি বা কাটিনি (এখন বাজছে অথবা মিস হয়েছে)
+function unseenCall(c, type, peer) {
   if (!c || c.answer || c.endedBy === me.uid) return false;
-  return c.status === "ended" ||
-    (c.status === "ringing" && c.createdAt && Date.now() - c.createdAt > 90000);
+  if (c.status !== "ended" && c.status !== "ringing") return false;
+  if ((c.type || "voice") !== type) return false;
+  if (peer && c.callerId !== peer) return false;
+  return (c.createdAt || 0) > lr("call_" + type);
 }
 
 function missedCount(type, peer) {
   let n = 0;
-  for (const c of Object.values(inboxCalls)) {
-    if (!isMissed(c) || (c.type || "voice") !== type) continue;
-    if (peer && c.callerId !== peer) continue;
-    if ((c.createdAt || 0) > lr("call_" + type)) n++;
-  }
+  for (const c of Object.values(inboxCalls)) if (unseenCall(c, type, peer)) n++;
   return n;
+}
+
+function lastMissedCall(type, peer) {
+  let best = null;
+  for (const c of Object.values(inboxCalls))
+    if (unseenCall(c, type, peer) && (!best || (c.createdAt || 0) > (best.createdAt || 0))) best = c;
+  return best;
+}
+
+function fmtTime(ts) {
+  return ts ? new Date(ts).toLocaleString([], {month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"}) : "";
 }
 
 function setBadge(id, n) {
@@ -640,6 +659,7 @@ function markRead(peer) {
 function markSeen(type) {
   if (me) db.ref("lastRead/" + me.uid + "/call_" + type).set(TS).catch(() => {});
 }
+
 function watchLastRead() {
   if (!me) return;
   if (lastReadRef) lastReadRef.off();
@@ -763,7 +783,7 @@ function openChat(uid) {
   markRead(uid);
 }
 
-function closeChat() {
+  function closeChat() {
   if (selected) markRead(selected);
   cleanupMessages();
   show("chat", false);
@@ -828,6 +848,68 @@ $("sendForm").onsubmit = async e => {
   }
 };
 
+/* ---------- Ringtone / vibration ---------- */
+let audioCtx = null, ringTimer = null, vibTimer = null;
+const baseTitle = document.title;
+
+function unlockAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch (e) {}
+}
+["click", "touchstart", "keydown"].forEach(ev =>
+  document.addEventListener(ev, unlockAudio, {passive: true}));
+
+function beep(freq, start, dur, vol) {
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = "sine"; o.frequency.value = freq;
+  o.connect(g); g.connect(audioCtx.destination);
+  const t = audioCtx.currentTime + start;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.03);
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+
+function ringPattern(kind) {
+  if (!audioCtx) return;
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  if (kind === "in") {
+    beep(880, 0, 0.25, 0.4); beep(660, 0.3, 0.25, 0.4);
+    beep(880, 0.6, 0.25, 0.4); beep(660, 0.9, 0.25, 0.4);
+  } else {
+    beep(440, 0, 0.9, 0.2); beep(480, 0, 0.9, 0.2);
+  }
+}
+
+function startRing(kind) {
+  stopRing();
+  ringPattern(kind);
+  ringTimer = setInterval(() => ringPattern(kind), kind === "in" ? 2200 : 3500);
+  if (kind === "in") {
+    document.title = "📞 Incoming call…";
+    if (navigator.vibrate) {
+      navigator.vibrate([500, 300, 500, 300, 500]);
+      vibTimer = setInterval(() => navigator.vibrate([500, 300, 500, 300, 500]), 2500);
+    }
+  }
+}
+
+function stopRing() {
+  clearInterval(ringTimer); clearInterval(vibTimer);
+  ringTimer = vibTimer = null;
+  document.title = baseTitle;
+  if (navigator.vibrate) navigator.vibrate(0);
+}
+
+function notifyIncoming(name) {
+  try {
+    if (document.hidden && "Notification" in window && Notification.permission === "granted")
+      new Notification("Vynqora", { body: name + " is calling you", tag: "incoming-call" });
+  } catch (e) {}
+}
+
 /* ---------- WebRTC calls ----------
    Call path: calls/{receiverUid}/{callId}
    দুজনকেই একে অপরকে contact হিসেবে save করতে হবে। */
@@ -845,7 +927,7 @@ function watchIncomingCalls() {
 function onIncomingCall(snap) {
   const c = snap.val();
   if (!c || c.receiverId !== me?.uid || c.status !== "ringing") return;
-  if (c.createdAt && Date.now() - c.createdAt > 90000) return;
+  if (c.createdAt && now() - c.createdAt > 90000) return;
   if (!contacts[c.callerId]) return;
   if (incomingId === snap.key || callRef) return;
 
@@ -859,6 +941,8 @@ function onIncomingCall(snap) {
   say("callStatus", "Incoming " + callType + " call");
   show("callBox", true); show("answer", true);
   $("answer").onclick = () => answerCall(snap.key, c);
+  startRing("in");
+  notifyIncoming(contacts[c.callerId].name || "Contact");
 
   ref.child("status").on("value", s => {
     if (callRef === ref && s.val() === "ended") endCall(false);
@@ -947,11 +1031,19 @@ async function startCall(type, uid) {
         say("callStatus", "Could not connect: " + err(e));
       }
     });
+
+    ref.child("status").on("value", snap => {
+      if (callRef !== ref) return;
+      if (["ended", "rejected"].includes(snap.val())) endCall(false);
+      else if (snap.val() === "active") { stopRing(); say("callStatus", "Call answered. Connecting…"); }
+    });
+
     const c = contacts[receiverId];
     say("callTitle", "Calling " + (c.name || c.username));
     say("callStatus", "Ringing…");
     show("answer", false);
     show("callBox", true);
+    startRing("out");
 
   } catch (e) {
     await endCall(false);
@@ -964,6 +1056,7 @@ async function answerCall(id, c) {
   try {
     if (!me || !contacts[c.callerId]) throw new Error("Add this caller to your contacts first.");
 
+    stopRing();
     ref.child("status").off();
     callRef = ref;
     incomingId = id;
@@ -1009,10 +1102,10 @@ async function answerCall(id, c) {
     await endCall(true);
   }
 }
-
 async function endCall(writeStatus = true) {
   const ref = callRef, peer = pc, localStream = stream;
   callRef = null; pc = null; stream = null; callRole = "";
+  stopRing();
 
   if (writeStatus && ref) {
     try {
