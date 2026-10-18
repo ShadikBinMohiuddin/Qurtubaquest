@@ -30,7 +30,7 @@ button{padding:11px 13px;border:0;border-radius:7px;background:#25d366;color:#07
 .row input{flex:1;min-width:0}
 small,.muted{color:#aebac1}
 .center{text-align:center}
-#status,#profileStatus,#listStatus,#setStatus{font-size:13px;white-space:pre-wrap}
+#status,#profileStatus,#listStatus,#nameStatus,#passStatus,#delStatus,#fullStatus{font-size:13px;white-space:pre-wrap}
 
 /* Home tiles */
 #tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:420px;margin:18px auto}
@@ -62,6 +62,10 @@ small,.muted{color:#aebac1}
 .info small.missed{color:#ff6b78}
 .badge{position:absolute;top:0;right:4px;background:#e74c5b;color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:11px;display:grid;place-items:center;padding:0 5px}
 
+.menu-item{display:flex;justify-content:space-between;align-items:center;width:100%;margin:0;padding:16px 4px;border-radius:0;background:none;color:#e9edef;border-bottom:1px solid #35434b;font-size:16px;font-weight:normal;text-align:left}
+.menu-item:last-child{border-bottom:0}
+.menu-item.bad{color:#ff6b78}
+
 /* Chat */
 #messages{height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:8px;background:#0b141a;border-radius:8px}
 .msg{max-width:85%;background:#202c33;border-radius:9px;padding:10px;overflow-wrap:anywhere;white-space:pre-wrap}
@@ -75,6 +79,7 @@ small,.muted{color:#aebac1}
 .chat-bar h2{flex:1;min-width:0;margin:0;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chat-bar button{width:44px;height:44px;padding:0;margin:0;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
 .chat-bar svg{width:22px;height:22px}
+
 /* Call */
 video{width:48%;max-height:240px;background:#202c33}
 #callBox:not(.hidden){position:fixed;inset:0;z-index:2000;margin:0;border-radius:0;overflow:auto}
@@ -101,10 +106,13 @@ video{width:48%;max-height:240px;background:#202c33}
 </section>
 
 <section id="profile" class="hidden">
-<h2>Create Username</h2>
-<p class="muted">Use 3–20 lowercase letters, numbers or underscores.</p>
-<input id="username" maxlength="20" placeholder="e.g. shadik123">
-<button id="saveUsername">Save Username</button>
+<h2 id="profileTitle">Create Profile</h2>
+<input id="fullName" maxlength="40" placeholder="Full name (e.g. Shadik Mohiuddin)" autocomplete="name">
+<div id="usernameBox">
+<p class="muted">Username: 3–20 lowercase letters, numbers or underscores.</p>
+<input id="username" maxlength="20" placeholder="Username, e.g. shadik123">
+</div>
+<button id="saveUsername">Save &amp; Continue</button>
 <p id="profileStatus"></p>
 </section>
 
@@ -136,30 +144,61 @@ Add Contact</button>
 <div id="listBox"></div>
 </section>
 
-<!-- SETTINGS -->
+<!-- SETTINGS (menu) -->
 <div id="settings" class="hidden">
 <section>
-<h2>Account</h2>
-<p>Username: <b id="accName"></b><br><small id="accEmail"></small></p>
-<input id="newUsername" maxlength="20" placeholder="New username">
-<button id="saveNewName">Change Username</button>
+<p style="margin:0">Username: <b id="accName"></b><br><small id="accEmail"></small></p>
 </section>
+<section style="padding:4px 15px">
+<button class="menu-item" data-go="setFull"><span>Change Full Name</span><span>›</span></button>
+<button class="menu-item" data-go="setName"><span>Change Username</span><span>›</span></button>
+<button class="menu-item" data-go="setPass"><span>Change Password</span><span>›</span></button>
+<button class="menu-item" id="logout"><span>Logout</span><span>›</span></button>
+<button class="menu-item bad" data-go="setDelete"><span>Delete Account</span><span>›</span></button>
+</section>
+</div>
+
+<!-- CHANGE FULL NAME PAGE -->
+<div id="setFull" class="hidden">
+<section>
+<h2>Change Full Name</h2>
+<p class="muted">Current: <b id="curFull"></b><br>Your contacts will see this name.</p>
+<input id="newFull" maxlength="40" placeholder="Full name">
+<button id="saveFull">Save Name</button>
+<p id="fullStatus"></p>
+</section>
+</div>
+
+<!-- CHANGE USERNAME PAGE -->
+<div id="setName" class="hidden">
+<section>
+<h2>Change Username</h2>
+<p class="muted">Current: <b id="curName"></b><br>Use 3–20 lowercase letters, numbers or underscores.</p>
+<input id="newUsername" maxlength="20" placeholder="New username">
+<button id="saveNewName">Save Username</button>
+<p id="nameStatus"></p>
+</section>
+</div>
+
+<!-- CHANGE PASSWORD PAGE -->
+<div id="setPass" class="hidden">
 <section>
 <h2>Change Password</h2>
 <input id="curPass" type="password" placeholder="Current password" autocomplete="current-password">
 <input id="newPass" type="password" placeholder="New password (min 6 characters)" autocomplete="new-password">
-<button id="savePass">Change Password</button>
+<button id="savePass">Save Password</button>
+<p id="passStatus"></p>
 </section>
-<section>
-<h2>Session</h2>
-<button id="logout" class="secondary">Logout</button>
-</section>
+</div>
+
+<!-- DELETE ACCOUNT PAGE -->
+<div id="setDelete" class="hidden">
 <section>
 <h2 style="color:#e74c5b">Delete Account</h2>
-<p class="muted">Your account, username, contacts and sent messages will be deleted permanently.</p>
+<p class="muted">Your account, username, contacts and sent messages will be deleted permanently. This cannot be undone.</p>
 <input id="delPass" type="password" placeholder="Enter password to confirm" autocomplete="current-password">
-<button id="deleteAcc" class="danger">Delete My Account</button>
-<p id="setStatus"></p>
+<button id="deleteAcc" class="danger">Confirm Delete</button>
+<p id="delStatus"></p>
 </section>
 </div>
 
@@ -243,6 +282,11 @@ let msgRefs = [], callRef = null, pc = null, stream = null;
 let callRole = "", incomingId = null, callType = "voice";
 let inboxRef = null, contactRef = null, membersRef = null;
 let requests = {}, sentReq = {}, reqRef = null, sentRef = null;
+let fullNames = {}, myFullName = "", profilesRef = null;
+function myLabel() { return myFullName ? myFullName + " (@" + myUsername + ")" : "@" + myUsername; }
+function dispName(uid) {
+  return fullNames[uid] || (contacts[uid] && contacts[uid].name) || uidName[uid] || "";
+}
 let lastRead = {}, incoming = {}, inboxCalls = {}, msgWatch = {}, msgRetry = {}, lastMsg = {};
 let lastReadRef = null, callStatRef = null;
 
@@ -261,7 +305,9 @@ function err(e) {
 
 /* ---------- Navigation ---------- */
 const TITLES = {home:"☾ Vynqora", chat:"Messages", call:"Voice Call", video:"Video Call",
-  add:"Add Contact", profile:"My Contacts", requests:"Friend Requests", settings:"Settings"};
+  add:"Add Contact", profile:"My Contacts", requests:"Friend Requests", settings:"Settings",
+  setName:"Change Username", setPass:"Change Password", setDelete:"Delete Account", setFull:"Change Full Name"};
+const SETTINGS_GROUP = ["settings","setFull","setName","setPass","setDelete"];
 const LIST_MODES = ["chat","call","video","add","profile","requests"];
 
 function go(m) {
@@ -270,24 +316,26 @@ function go(m) {
   mode = m;
   show("home", m === "home");
   show("listView", LIST_MODES.includes(m));
-  show("settings", m === "settings");
+  SETTINGS_GROUP.forEach(id => show(id, m === id));
   show("backBtn", m !== "home");
   say("title", TITLES[m]);
   $("navProfile").classList.toggle("on", m === "profile");
   $("navRequests").classList.toggle("on", m === "requests");
-  $("navSettings").classList.toggle("on", m === "settings");
+  $("navSettings").classList.toggle("on", SETTINGS_GROUP.includes(m));
   $("search").value = "";
-  say("listStatus", ""); say("setStatus", "");
+  say("listStatus", ""); say("nameStatus", ""); say("passStatus", ""); say("delStatus", ""); say("fullStatus", "");
+  ["newUsername", "curPass", "newPass", "delPass", "newFull"].forEach(id => $(id).value = "");
+  if (m === "setFull") say("curFull", myFullName || "—");
+  if (m === "setName") say("curName", "@" + myUsername);
   if (m === "settings") {
-    say("accName", "@" + myUsername);
+    say("accName", myLabel());
     say("accEmail", me ? me.email : "");
   }
   renderList();
   window.scrollTo(0, 0);
 }
 document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
-$("backBtn").onclick = () => go("home");
-
+$("backBtn").onclick = () => go(["setFull", "setName", "setPass", "setDelete"].includes(mode) ? "settings" : "home");
 /* ---------- Auth ---------- */
 $("login").onclick = async () => {
   try {
@@ -304,9 +352,8 @@ $("signup").onclick = async () => {
     const result = await auth.createUserWithEmailAndPassword(email, password);
     const profile = await db.ref("users/" + result.user.uid).once("value");
     if (!profile.exists() || !profile.val().username) {
-      $("username").value = "";
-      show("auth", false); show("profile", true); show("app", false);
-      say("profileStatus", "নতুন Account! এবার নিজের Username তৈরি করো।");
+      showProfileSetup(true);
+      say("profileStatus", "নতুন Account! নিজের পুরো নাম আর Username দাও।");
     }
   } catch (e) {
     if (e.code === "auth/email-already-in-use")
@@ -314,7 +361,7 @@ $("signup").onclick = async () => {
     else say("status", err(e));
   }
 };
-  
+
 $("forgot").onclick = async () => {
   const email = $("email").value.trim();
   if (!email) { say("status", "আগে উপরে Email address লিখো, তারপর Forgot password চাপো।"); return; }
@@ -341,16 +388,17 @@ function stopWatchers() {
   if (reqRef) { reqRef.off(); reqRef = null; }
   if (sentRef) { sentRef.off(); sentRef = null; }
   if (lastReadRef) { lastReadRef.off(); lastReadRef = null; }
-  if (callStatRef) { callStatRef.off(); callStatRef = null; }
+  if (profilesRef) { profilesRef.off(); profilesRef = null; }
+  stopCallStats();
   Object.values(msgWatch).forEach(r => r.off());
   msgWatch = {}; msgRetry = {}; lastMsg = {};
 }
 
 function startApp() {
-  say("myName", "@" + myUsername);
+  say("myName", myLabel());
   show("profile", false); show("app", true);
   go("home");
-  watchContacts(); watchMembers(); watchRequests(); watchLastRead(); watchCallStats(); watchIncomingCalls();
+  watchContacts(); watchMembers(); watchProfiles(); watchRequests(); watchLastRead(); watchCallStats(); watchIncomingCalls();
 }
 
 auth.onAuthStateChanged(async user => {
@@ -358,7 +406,7 @@ auth.onAuthStateChanged(async user => {
   me = user;
   if (!user) {
     myUsername = ""; contacts = {}; members = {}; uidName = {}; selected = null;
-    requests = {}; sentReq = {}; lastRead = {}; incoming = {}; inboxCalls = {}; updateBadge();
+    requests = {}; sentReq = {}; fullNames = {}; myFullName = ""; lastRead = {}; incoming = {}; inboxCalls = {}; updateBadge();
     show("chat", false); $("chat").classList.remove("chat-screen");
     show("auth",true); show("profile",false); show("app",false);
     return;
@@ -367,28 +415,48 @@ auth.onAuthStateChanged(async user => {
   try {
     const snap = await db.ref("users/"+user.uid).once("value");
     const profile = snap.val();
-    if (!profile || !profile.username) { show("profile",true); show("app",false); return; }
+    if (!profile || !profile.username) { myUsername = ""; showProfileSetup(true); return; }
     myUsername = profile.username;
+    const ps = (await db.ref("profiles/"+user.uid).once("value")).val();
+    if (!ps || !ps.name) { myFullName = ""; showProfileSetup(false); return; }
+    myFullName = ps.name;
     startApp();
   } catch(e) { show("profile",true); say("profileStatus",err(e)); }
 });
 
+function showProfileSetup(needUsername) {
+  show("auth", false); show("app", false); show("profile", true);
+  show("usernameBox", needUsername);
+  say("profileTitle", needUsername ? "Create Profile" : "Add Your Full Name");
+  if (needUsername) $("username").value = "";
+}
+
 $("saveUsername").onclick = async () => {
   if (!me) return;
-  const username = norm($("username").value);
-  if (!validUsername(username)) {
-    say("profileStatus","Use 3–20 lowercase letters, numbers or underscores."); return;
+  const fullName = $("fullName").value.trim().replace(/\s+/g, " ");
+  if (!fullName || fullName.length > 40) { say("profileStatus", "Full name must be 1–40 characters."); return; }
+  const needUser = !myUsername;
+  let username = myUsername;
+  if (needUser) {
+    username = norm($("username").value);
+    if (!validUsername(username)) {
+      say("profileStatus", "Username: 3–20 lowercase letters, numbers or underscores."); return;
+    }
   }
   $("saveUsername").disabled = true;
   try {
-    const r = await db.ref("usernames/"+username).transaction(v => v === null ? me.uid : undefined);
-    if (!r.committed || r.snapshot.val() !== me.uid) {
-      say("profileStatus","Username already taken. Try another."); return;
+    if (needUser) {
+      const r = await db.ref("usernames/"+username).transaction(v => v === null ? me.uid : undefined);
+      if (!r.committed || r.snapshot.val() !== me.uid) {
+        say("profileStatus", "Username already taken. Try another."); return;
+      }
+      await db.ref("users/"+me.uid).set({username});
+      myUsername = username;
     }
-    await db.ref("users/"+me.uid).set({username});
-    myUsername = username;
+    await db.ref("profiles/"+me.uid).set({name: fullName});
+    myFullName = fullName;
     startApp();
-  } catch(e) { say("profileStatus",err(e)); }
+  } catch(e) { say("profileStatus", err(e)); }
   finally { $("saveUsername").disabled = false; }
 };
 
@@ -405,6 +473,21 @@ function watchContacts() {
     watchIncomingCalls();
     if (selected && !contacts[selected]) clearChat();
   }, e => say("listStatus",err(e)));
+}
+
+function watchProfiles() {
+  if (!me) return;
+  if (profilesRef) profilesRef.off();
+  profilesRef = db.ref("profiles");
+  profilesRef.on("value", snap => {
+    const v = snap.val() || {};
+    fullNames = {};
+    for (const [id, p] of Object.entries(v)) if (p && p.name) fullNames[id] = p.name;
+    if (me && fullNames[me.uid]) myFullName = fullNames[me.uid];
+    say("myName", myLabel());
+    if (selected) say("chatName", dispName(selected));
+    renderList();
+  }, e => say("listStatus", err(e)));
 }
 
 function watchMembers() {
@@ -438,15 +521,15 @@ function renderList() {
   if (mode === "requests") {
     items = Object.entries(requests).map(([uid, r]) => {
       const u = uidName[uid] || r.username || "";
-      return {uid, name: u, username: u};
+      return {uid, name: fullNames[uid] || u, username: u};
     });
   } else if (mode === "add") {
     items = Object.entries(members).filter(([u, uid]) => uid !== me.uid)
-      .map(([u, uid]) => ({uid, name: u, username: u}));
+      .map(([u, uid]) => ({uid, name: fullNames[uid] || u, username: u}));
   } else {
     items = Object.entries(contacts).map(([uid, c]) => {
       const username = uidName[uid] || c.username || "";
-      return {uid, name: c.name || username, username};
+      return {uid, name: dispName(uid) || username, username};
     });
   }
   items = items.filter(i => i.name.toLowerCase().includes(q) || i.username.toLowerCase().includes(q));
@@ -562,9 +645,7 @@ function applySentNames() {
 }
 
 async function sendRequest(uid, username) {
-  const name = (prompt("Save this contact as:", username) || "").trim();
-  if (!name) return;
-  if (name.length > 40) { say("listStatus", "Name must be 1–40 characters."); return; }
+  const name = (fullNames[uid] || username).slice(0, 40);
   try {
     await db.ref("requests/" + uid + "/" + me.uid).set({username: myUsername, createdAt: TS});
     await db.ref("sent/" + me.uid + "/" + uid).set({name, createdAt: TS});
@@ -582,12 +663,10 @@ async function cancelRequest(uid) {
 
 async function acceptRequest(uid) {
   const uname = uidName[uid] || (requests[uid] && requests[uid].username) || "";
-  const name = (prompt("Save this contact as:", uname) || "").trim();
-  if (!name) return;
-  if (name.length > 40) { say("listStatus", "Name must be 1–40 characters."); return; }
+  const name = (fullNames[uid] || uname).slice(0, 40);
   try {
     await db.ref("contacts/" + me.uid + "/" + uid).set({name, username: uname, addedAt: TS});
-    await db.ref("contacts/" + uid + "/" + me.uid).set({name: myUsername, username: myUsername, addedAt: TS});
+    await db.ref("contacts/" + uid + "/" + me.uid).set({name: (myFullName || myUsername).slice(0, 40), username: myUsername, addedAt: TS});
     await db.ref("requests/" + me.uid + "/" + uid).remove();
     msgRetry = {}; watchIncomingMessages();
     say("listStatus", "You and @" + uname + " are now contacts.");
@@ -600,8 +679,7 @@ async function rejectRequest(uid) {
     await db.ref("sent/" + uid + "/" + me.uid).remove();
   } catch(e) { say("listStatus", err(e)); }
 }
-
-/* ---------- Unread messages & missed calls ---------- */
+  /* ---------- Unread messages & missed calls ---------- */
 function lr(k) { return lastRead[k] || 0; }
 
 function unreadFor(peer) {
@@ -668,12 +746,17 @@ function watchLastRead() {
     e => console.warn("lastRead error:", e));
 }
 
+function onCallStats(snap) { inboxCalls = snap.val() || {}; updateBadges(); }
+
+function stopCallStats() {
+  if (callStatRef) { callStatRef.off("value", onCallStats); callStatRef = null; }
+}
+
 function watchCallStats() {
   if (!me) return;
-  if (callStatRef) callStatRef.off();
+  stopCallStats();
   callStatRef = db.ref("calls/" + me.uid);
-  callStatRef.on("value", snap => { inboxCalls = snap.val() || {}; updateBadges(); },
-    e => console.warn("call stats error:", e));
+  callStatRef.on("value", onCallStats, e => console.warn("call stats error:", e));
 }
 
 function watchIncomingMessages() {
@@ -707,20 +790,20 @@ function watchIncomingMessages() {
 /* ---------- Settings ---------- */
 $("saveNewName").onclick = async () => {
   const u = norm($("newUsername").value);
-  if (!validUsername(u)) { say("setStatus", "Use 3–20 lowercase letters, numbers or underscores."); return; }
-  if (u === myUsername) { say("setStatus", "This is already your username."); return; }
+  if (!validUsername(u)) { say("nameStatus", "Use 3–20 lowercase letters, numbers or underscores."); return; }
+  if (u === myUsername) { say("nameStatus", "This is already your username."); return; }
   $("saveNewName").disabled = true;
   try {
     const old = myUsername;
     const r = await db.ref("usernames/"+u).transaction(v => v === null ? me.uid : undefined);
-    if (!r.committed || r.snapshot.val() !== me.uid) { say("setStatus", "Username already taken."); return; }
+    if (!r.committed || r.snapshot.val() !== me.uid) { say("nameStatus", "Username already taken."); return; }
     await db.ref("users/"+me.uid).set({username: u});
     await db.ref("usernames/"+old).remove();
     myUsername = u;
-    say("myName", "@" + u); say("accName", "@" + u);
+    say("myName", myLabel()); say("accName", myLabel());
     $("newUsername").value = "";
-    say("setStatus", "Username changed.");
-  } catch(e) { say("setStatus", err(e)); }
+    say("nameStatus", "Username changed.");
+  } catch(e) { say("nameStatus", err(e)); }
   finally { $("saveNewName").disabled = false; }
 };
 
@@ -732,13 +815,13 @@ async function reauth(password) {
 
 $("savePass").onclick = async () => {
   const np = $("newPass").value;
-  if (np.length < 6) { say("setStatus", "New password must be at least 6 characters."); return; }
+  if (np.length < 6) { say("passStatus", "New password must be at least 6 characters."); return; }
   try {
     await reauth($("curPass").value);
     await me.updatePassword(np);
     $("curPass").value = ""; $("newPass").value = "";
-    say("setStatus", "Password changed.");
-  } catch(e) { say("setStatus", err(e)); }
+    say("passStatus", "Password changed.");
+  } catch(e) { say("passStatus", err(e)); }
 };
 
 $("deleteAcc").onclick = async () => {
@@ -755,6 +838,7 @@ $("deleteAcc").onclick = async () => {
     await db.ref("requests/"+uid).remove();
     await db.ref("sent/"+uid).remove();
     await db.ref("lastRead/"+uid).remove();
+    await db.ref("profiles/"+uid).remove();
     await db.ref("messages/"+uid).remove();
     await db.ref("calls/"+uid).remove();
     await db.ref("contacts/"+uid).remove();
@@ -762,9 +846,21 @@ $("deleteAcc").onclick = async () => {
     await db.ref("users/"+uid).remove();
     await user.delete();
   } catch(e) {
-    say("setStatus", err(e));
-    if (me) { watchContacts(); watchMembers(); watchRequests(); watchIncomingCalls(); }
+    say("delStatus", err(e));
+    if (me) { watchContacts(); watchMembers(); watchProfiles(); watchRequests(); watchIncomingCalls(); }
   }
+};
+
+$("saveFull").onclick = async () => {
+  const n = $("newFull").value.trim().replace(/\s+/g, " ");
+  if (!n || n.length > 40) { say("fullStatus", "Full name must be 1–40 characters."); return; }
+  try {
+    await db.ref("profiles/" + me.uid).set({name: n});
+    myFullName = n;
+    say("curFull", n); say("myName", myLabel());
+    $("newFull").value = "";
+    say("fullStatus", "Name changed.");
+  } catch(e) { say("fullStatus", err(e)); }
 };
 
 /* ---------- Chat ---------- */
@@ -773,7 +869,7 @@ function openChat(uid) {
   cleanupMessages();
   selected = uid;
   const c = contacts[uid];
-  say("chatName", c.name || uidName[uid] || c.username);
+  say("chatName", dispName(uid));
   say("chatStatus", "");
   $("messages").replaceChildren();
   $("message").value = "";
@@ -783,7 +879,7 @@ function openChat(uid) {
   markRead(uid);
 }
 
-  function closeChat() {
+function closeChat() {
   if (selected) markRead(selected);
   cleanupMessages();
   show("chat", false);
@@ -914,7 +1010,13 @@ function notifyIncoming(name) {
    Call path: calls/{receiverUid}/{callId}
    দুজনকেই একে অপরকে contact হিসেবে save করতে হবে। */
 
-function stopInbox() { if (inboxRef) { inboxRef.off(); inboxRef = null; } }
+function stopInbox() {
+  if (inboxRef) {
+    inboxRef.off("child_added", onIncomingCall);
+    inboxRef.off("child_changed", onIncomingCall);
+    inboxRef = null;
+  }
+}
 
 function watchIncomingCalls() {
   if (!me) return;
@@ -937,12 +1039,12 @@ function onIncomingCall(snap) {
   callRole = "callee";
   callType = c.type || "voice";
 
-  say("callTitle", (contacts[c.callerId].name || "Contact") + " is calling");
+  say("callTitle", (dispName(c.callerId) || "Contact") + " is calling");
   say("callStatus", "Incoming " + callType + " call");
   show("callBox", true); show("answer", true);
   $("answer").onclick = () => answerCall(snap.key, c);
   startRing("in");
-  notifyIncoming(contacts[c.callerId].name || "Contact");
+  notifyIncoming(dispName(c.callerId) || "Contact");
 
   ref.child("status").on("value", s => {
     if (callRef === ref && s.val() === "ended") endCall(false);
@@ -1031,15 +1133,13 @@ async function startCall(type, uid) {
         say("callStatus", "Could not connect: " + err(e));
       }
     });
-
     ref.child("status").on("value", snap => {
       if (callRef !== ref) return;
       if (["ended", "rejected"].includes(snap.val())) endCall(false);
       else if (snap.val() === "active") { stopRing(); say("callStatus", "Call answered. Connecting…"); }
     });
 
-    const c = contacts[receiverId];
-    say("callTitle", "Calling " + (c.name || c.username));
+    say("callTitle", "Calling " + dispName(receiverId));
     say("callStatus", "Ringing…");
     show("answer", false);
     show("callBox", true);
@@ -1091,7 +1191,7 @@ async function answerCall(id, c) {
       if (callRef === ref && snap.val() === "ended") endCall(false);
     });
 
-    say("callTitle", "Call with " + (contacts[c.callerId].name || contacts[c.callerId].username));
+    say("callTitle", "Call with " + dispName(c.callerId));
     say("callStatus", "Connecting…");
     show("callBox", true);
     show("answer", false);
@@ -1102,6 +1202,7 @@ async function answerCall(id, c) {
     await endCall(true);
   }
 }
+
 async function endCall(writeStatus = true) {
   const ref = callRef, peer = pc, localStream = stream;
   callRef = null; pc = null; stream = null; callRole = "";
@@ -1136,3 +1237,5 @@ $("endCall").onclick = () => endCall(true);
 </script>
 </body>
 </html>
+
+    
