@@ -17,7 +17,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:#0b141a;color:#e9edef;font:15px Arial}
 header{background:#202c33;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;min-height:58px}
-h1{font-size:20px;margin:0;color:#25d366;flex:1}
+h1{font-size:21px;margin:0;color:#25d366;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
 main{max-width:900px;margin:auto;padding:12px 12px 100px}
 section,.panel{background:#111b21;border-radius:12px;padding:15px;margin-bottom:12px}
 h2{margin:0 0 10px}
@@ -120,7 +120,7 @@ video{width:48%;max-height:240px;background:#202c33}
 
 <!-- HOME -->
 <div id="home">
-<p class="muted center">Signed in as <b id="myName"></b></p>
+<p class="center" style="font-size:22px;margin:14px 0 0"><b id="myName"></b></p>
 <div id="tiles">
 <button class="tile t1" data-go="chat"><span id="bdgChat" class="badge hidden">0</span>
 <svg viewBox="0 0 24 24"><path d="M5 3h14a3 3 0 013 3v9a3 3 0 01-3 3h-8l-5 4v-4H5a3 3 0 01-3-3V6a3 3 0 013-3z" fill="#fff"/><circle cx="8" cy="10.5" r="1.4" fill="currentColor"/><circle cx="12" cy="10.5" r="1.4" fill="currentColor"/><circle cx="16" cy="10.5" r="1.4" fill="currentColor"/></svg>
@@ -283,6 +283,7 @@ let callRole = "", incomingId = null, callType = "voice";
 let inboxRef = null, contactRef = null, membersRef = null;
 let requests = {}, sentReq = {}, reqRef = null, sentRef = null;
 let fullNames = {}, myFullName = "", profilesRef = null;
+function myHomeName() { return myFullName || "@" + myUsername; }
 function myLabel() { return myFullName ? myFullName + " (@" + myUsername + ")" : "@" + myUsername; }
 function dispName(uid) {
   return fullNames[uid] || (contacts[uid] && contacts[uid].name) || uidName[uid] || "";
@@ -302,7 +303,6 @@ function err(e) {
     ? "Firebase Rules permission denied. Check your Database Rules."
     : (e.message || "Something went wrong.");
 }
-
 /* ---------- Navigation ---------- */
 const TITLES = {home:"☾ Vynqora", chat:"Messages", call:"Voice Call", video:"Video Call",
   add:"Add Contact", profile:"My Contacts", requests:"Friend Requests", settings:"Settings",
@@ -336,6 +336,7 @@ function go(m) {
 }
 document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
 $("backBtn").onclick = () => go(["setFull", "setName", "setPass", "setDelete"].includes(mode) ? "settings" : "home");
+
 /* ---------- Auth ---------- */
 $("login").onclick = async () => {
   try {
@@ -395,7 +396,7 @@ function stopWatchers() {
 }
 
 function startApp() {
-  say("myName", myLabel());
+  say("myName", myHomeName());
   show("profile", false); show("app", true);
   go("home");
   watchContacts(); watchMembers(); watchProfiles(); watchRequests(); watchLastRead(); watchCallStats(); watchIncomingCalls();
@@ -484,7 +485,7 @@ function watchProfiles() {
     fullNames = {};
     for (const [id, p] of Object.entries(v)) if (p && p.name) fullNames[id] = p.name;
     if (me && fullNames[me.uid]) myFullName = fullNames[me.uid];
-    say("myName", myLabel());
+    say("myName", myHomeName());
     if (selected) say("chatName", dispName(selected));
     renderList();
   }, e => say("listStatus", err(e)));
@@ -679,7 +680,7 @@ async function rejectRequest(uid) {
     await db.ref("sent/" + uid + "/" + me.uid).remove();
   } catch(e) { say("listStatus", err(e)); }
 }
-  /* ---------- Unread messages & missed calls ---------- */
+/* ---------- Unread messages & missed calls ---------- */
 function lr(k) { return lastRead[k] || 0; }
 
 function unreadFor(peer) {
@@ -800,7 +801,7 @@ $("saveNewName").onclick = async () => {
     await db.ref("users/"+me.uid).set({username: u});
     await db.ref("usernames/"+old).remove();
     myUsername = u;
-    say("myName", myLabel()); say("accName", myLabel());
+    say("myName", myHomeName()); say("accName", myLabel());
     $("newUsername").value = "";
     say("nameStatus", "Username changed.");
   } catch(e) { say("nameStatus", err(e)); }
@@ -857,7 +858,7 @@ $("saveFull").onclick = async () => {
   try {
     await db.ref("profiles/" + me.uid).set({name: n});
     myFullName = n;
-    say("curFull", n); say("myName", myLabel());
+    say("curFull", n); say("myName", myHomeName());
     $("newFull").value = "";
     say("fullStatus", "Name changed.");
   } catch(e) { say("fullStatus", err(e)); }
@@ -1237,5 +1238,3 @@ $("endCall").onclick = () => endCall(true);
 </script>
 </body>
 </html>
-
-    
