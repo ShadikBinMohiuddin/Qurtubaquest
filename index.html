@@ -3,7 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Vynqora</title>
+<title>Vynqora – Chat, Voice Call &amp; Video Call App</title>
+<meta name="description" content="Vynqora is a free messaging app. Sign up, add friends, send messages and make voice and video calls right from your browser.">
+<meta name="keywords" content="Vynqora, chat app, messaging app, voice call, video call, free chat">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b141a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Vynqora">
+<meta property="og:title" content="Vynqora – Chat, Voice Call &amp; Video Call App">
+<meta property="og:description" content="Add friends, send messages and make voice and video calls from your browser.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b141a'/><path d='M12 38C12 20 28 12 42 14c8 2 8 14 4 26-2 6-10 8-20 8-9 0-14-4-14-10z' fill='%2322c55e'/><path d='M58 14c20-2 32 10 30 28-1 8-12 10-22 8-8-2-12-8-10-18 1-8 0-16 2-18z' fill='%231d6ff2'/><path d='M14 56c2-8 14-10 24-6 8 3 8 12 6 22-2 10-12 18-24 14C8 82 10 66 14 56z' fill='%237c3aed'/><path d='M58 58c6-6 18-6 26 0 6 6 4 20-6 28-12 8-26 4-26-8 0-8 2-14 6-20z' fill='%23f59e0b'/></svg>">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -26,7 +34,7 @@ small,.muted{color:#aebac1}
 
 /* Home tiles */
 #tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:420px;margin:18px auto}
-.tile{aspect-ratio:1;margin:0;border:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:bold;box-shadow:inset 0 3px 8px rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.4)}
+.tile{position:relative;aspect-ratio:1;margin:0;border:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:bold;box-shadow:inset 0 3px 8px rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.4)}
 .tile svg{width:30%;height:auto}
 .t1{background:linear-gradient(145deg,#4ade80,#047857);border-radius:55% 45% 48% 52%/60% 52% 48% 40%;color:#fff}
 .t2{background:linear-gradient(145deg,#38a1ff,#0040d0);border-radius:48% 52% 45% 55%/52% 58% 42% 48%}
@@ -46,6 +54,8 @@ small,.muted{color:#aebac1}
 #nav button{position:relative;background:none;color:#aebac1;margin:0;padding:8px 16px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px}
 #nav button.on{color:#25d366}
 #nav svg{width:28px;height:28px}
+.tile .badge{top:14%;right:14%;min-width:26px;height:26px;font-size:14px;box-shadow:0 0 0 3px #0b141a}
+.pill{position:static;display:inline-grid;flex-shrink:0}
 .badge{position:absolute;top:0;right:4px;background:#e74c5b;color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:11px;display:grid;place-items:center;padding:0 5px}
 
 /* Chat */
@@ -75,7 +85,8 @@ video{width:48%;max-height:240px;background:#202c33}
 
 <main>
 <section id="auth">
-<h2>Welcome</h2>
+<h2>Welcome to Vynqora</h2>
+<p class="muted">Chat, voice call and video call with your friends. Create a free account to get started.</p>
 <input id="email" type="email" placeholder="Email address" autocomplete="email">
 <input id="password" type="password" placeholder="Password (minimum 6 characters)">
 <div class="row">
@@ -95,19 +106,22 @@ video{width:48%;max-height:240px;background:#202c33}
 </section>
 
 <div id="app" class="hidden">
-  
 
 <!-- HOME -->
 <div id="home">
+<div id="permBox" class="panel hidden" style="margin:8px auto;max-width:420px">
+<p id="permText" style="margin:0 0 8px"></p>
+<button id="permBtn" style="margin:0">Allow Mic &amp; Camera</button>
+</div>
 <p class="muted center">Signed in as <b id="myName"></b></p>
 <div id="tiles">
-<button class="tile t1" data-go="chat">
+<button class="tile t1" data-go="chat"><span id="bdgChat" class="badge hidden">0</span>
 <svg viewBox="0 0 24 24"><path d="M5 3h14a3 3 0 013 3v9a3 3 0 01-3 3h-8l-5 4v-4H5a3 3 0 01-3-3V6a3 3 0 013-3z" fill="#fff"/><circle cx="8" cy="10.5" r="1.4" fill="currentColor"/><circle cx="12" cy="10.5" r="1.4" fill="currentColor"/><circle cx="16" cy="10.5" r="1.4" fill="currentColor"/></svg>
 Messages</button>
-<button class="tile t2" data-go="call">
+<button class="tile t2" data-go="call"><span id="bdgCall" class="badge hidden">0</span>
 <svg viewBox="0 0 24 24"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25c1.1.37 2.3.57 3.6.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1z"/></svg>
 Voice Call</button>
-<button class="tile t3" data-go="video">
+<button class="tile t3" data-go="video"><span id="bdgVideo" class="badge hidden">0</span>
 <svg viewBox="0 0 24 24"><rect x="2" y="6" width="13" height="12" rx="3" fill="#fff"/><path d="M17 10l5-3.5v11L17 14z" fill="#fff"/></svg>
 Video Call</button>
 <button class="tile t4" data-go="add">
@@ -227,6 +241,8 @@ let msgRefs = [], callRef = null, pc = null, stream = null;
 let callRole = "", incomingId = null, callType = "voice";
 let inboxRef = null, contactRef = null, membersRef = null;
 let requests = {}, sentReq = {}, reqRef = null, sentRef = null;
+let lastRead = {}, incoming = {}, inboxCalls = {}, msgWatch = {}, msgRetry = {};
+let lastReadRef = null, callStatRef = null;
 
 // ভিন্ন নেটওয়ার্কে কল চালাতে TURN server লাগতে পারে।
 const rtcConfig = { iceServers: [{urls:"stun:stun.l.google.com:19302"}] };
@@ -240,13 +256,14 @@ function err(e) {
     ? "Firebase Rules permission denied. Check your Database Rules."
     : (e.message || "Something went wrong.");
 }
-
-/* ---------- Navigation ---------- */
+  /* ---------- Navigation ---------- */
 const TITLES = {home:"☾ Vynqora", chat:"Messages", call:"Voice Call", video:"Video Call",
   add:"Add Contact", profile:"My Contacts", requests:"Friend Requests", settings:"Settings"};
 const LIST_MODES = ["chat","call","video","add","profile","requests"];
 
 function go(m) {
+  const prev = mode;
+  if (prev !== m && (prev === "call" || prev === "video")) markSeen(prev === "call" ? "voice" : "video");
   mode = m;
   show("home", m === "home");
   show("listView", LIST_MODES.includes(m));
@@ -320,13 +337,18 @@ function stopWatchers() {
   if (membersRef) { membersRef.off(); membersRef = null; }
   if (reqRef) { reqRef.off(); reqRef = null; }
   if (sentRef) { sentRef.off(); sentRef = null; }
+  if (lastReadRef) { lastReadRef.off(); lastReadRef = null; }
+  if (callStatRef) { callStatRef.off(); callStatRef = null; }
+  Object.values(msgWatch).forEach(r => r.off());
+  msgWatch = {}; msgRetry = {};
 }
 
 function startApp() {
   say("myName", "@" + myUsername);
   show("profile", false); show("app", true);
   go("home");
-  watchContacts(); watchMembers(); watchRequests(); watchIncomingCalls();
+  checkPerms();
+  watchContacts(); watchMembers(); watchRequests(); watchLastRead(); watchCallStats(); watchIncomingCalls();
 }
 
 auth.onAuthStateChanged(async user => {
@@ -334,7 +356,7 @@ auth.onAuthStateChanged(async user => {
   me = user;
   if (!user) {
     myUsername = ""; contacts = {}; members = {}; uidName = {}; selected = null;
-    requests = {}; sentReq = {}; updateBadge();
+    requests = {}; sentReq = {}; lastRead = {}; incoming = {}; inboxCalls = {}; updateBadge();
     show("chat", false); $("chat").classList.remove("chat-screen");
     show("auth",true); show("profile",false); show("app",false);
     return;
@@ -367,7 +389,7 @@ $("saveUsername").onclick = async () => {
   } catch(e) { say("profileStatus",err(e)); }
   finally { $("saveUsername").disabled = false; }
 };
-  
+
 /* ---------- Contacts & members ---------- */
 function watchContacts() {
   if (!me) return;
@@ -377,6 +399,7 @@ function watchContacts() {
     contacts = snap.val() || {};
     renderList();
     applySentNames();
+    watchIncomingMessages();
     watchIncomingCalls();
     if (selected && !contacts[selected]) clearChat();
   }, e => say("listStatus",err(e)));
@@ -408,8 +431,7 @@ function renderList() {
   const box = $("listBox");
   box.replaceChildren();
   const q = norm($("search").value);
-
-  let items;
+let items;
   if (mode === "requests") {
     items = Object.entries(requests).map(([uid, r]) => {
       const u = uidName[uid] || r.username || "";
@@ -448,6 +470,14 @@ function renderList() {
     const s = document.createElement("small"); s.textContent = "@" + i.username;
     info.append(b, s);
     row.append(av, info);
+    const cnt = mode === "chat" ? unreadFor(i.uid)
+      : mode === "call" ? missedCount("voice", i.uid)
+      : mode === "video" ? missedCount("video", i.uid) : 0;
+    if (cnt > 0) {
+      const pb = document.createElement("span");
+      pb.className = "badge pill"; pb.textContent = cnt > 99 ? "99+" : cnt;
+      row.appendChild(pb);
+    }
 
     if (mode === "chat") {
       row.onclick = () => openChat(i.uid);
@@ -544,6 +574,7 @@ async function acceptRequest(uid) {
     await db.ref("contacts/" + me.uid + "/" + uid).set({name, username: uname, addedAt: TS});
     await db.ref("contacts/" + uid + "/" + me.uid).set({name: myUsername, username: myUsername, addedAt: TS});
     await db.ref("requests/" + me.uid + "/" + uid).remove();
+    msgRetry = {}; watchIncomingMessages();
     say("listStatus", "You and @" + uname + " are now contacts.");
   } catch(e) { say("listStatus", err(e)); }
 }
@@ -553,6 +584,96 @@ async function rejectRequest(uid) {
     await db.ref("requests/" + me.uid + "/" + uid).remove();
     await db.ref("sent/" + uid + "/" + me.uid).remove();
   } catch(e) { say("listStatus", err(e)); }
+}
+
+/* ---------- Unread messages & missed calls ---------- */
+function lr(k) { return lastRead[k] || 0; }
+
+function unreadFor(peer) {
+  const m = incoming[peer];
+  if (!m) return 0;
+  let n = 0;
+  for (const t of Object.values(m)) if (t > lr(peer)) n++;
+  return n;
+}
+
+function isMissed(c) {
+  if (!c || c.answer || c.endedBy === me.uid) return false;
+  return c.status === "ended" ||
+    (c.status === "ringing" && c.createdAt && Date.now() - c.createdAt > 90000);
+}
+
+function missedCount(type, peer) {
+  let n = 0;
+  for (const c of Object.values(inboxCalls)) {
+    if (!isMissed(c) || (c.type || "voice") !== type) continue;
+    if (peer && c.callerId !== peer) continue;
+    if ((c.createdAt || 0) > lr("call_" + type)) n++;
+  }
+  return n;
+}
+  function setBadge(id, n) {
+  $(id).textContent = n > 99 ? "99+" : n;
+  show(id, n > 0);
+}
+
+function updateBadges() {
+  if (!me) return;
+  let total = 0;
+  for (const peer of Object.keys(contacts)) total += unreadFor(peer);
+  setBadge("bdgChat", total);
+  setBadge("bdgCall", missedCount("voice"));
+  setBadge("bdgVideo", missedCount("video"));
+  renderList();
+}
+
+function markRead(peer) {
+  if (me) db.ref("lastRead/" + me.uid + "/" + peer).set(TS).catch(() => {});
+}
+function markSeen(type) {
+  if (me) db.ref("lastRead/" + me.uid + "/call_" + type).set(TS).catch(() => {});
+}
+
+function watchLastRead() {
+  if (!me) return;
+  if (lastReadRef) lastReadRef.off();
+  lastReadRef = db.ref("lastRead/" + me.uid);
+  lastReadRef.on("value", snap => { lastRead = snap.val() || {}; updateBadges(); },
+    e => console.warn("lastRead error:", e));
+}
+
+function watchCallStats() {
+  if (!me) return;
+  if (callStatRef) callStatRef.off();
+  callStatRef = db.ref("calls/" + me.uid);
+  callStatRef.on("value", snap => { inboxCalls = snap.val() || {}; updateBadges(); },
+    e => console.warn("call stats error:", e));
+}
+
+function watchIncomingMessages() {
+  if (!me) return;
+  for (const peer of Object.keys(msgWatch)) {
+    if (!contacts[peer]) { msgWatch[peer].off(); delete msgWatch[peer]; delete incoming[peer]; }
+  }
+  for (const peer of Object.keys(contacts)) {
+    if (msgWatch[peer]) continue;
+    const ref = db.ref("messages/" + peer + "/" + me.uid).limitToLast(100);
+    msgWatch[peer] = ref;
+    incoming[peer] = incoming[peer] || {};
+    ref.on("child_added", snap => {
+      const m = snap.val();
+      if (!m || m.senderId === me.uid) return;
+      incoming[peer][snap.key] = m.timestamp || Date.now();
+      if (selected === peer && !$("chat").classList.contains("hidden")) markRead(peer);
+      updateBadges();
+    }, () => {
+      // অপর পক্ষ এখনও contact হিসেবে add না করলে permission আসে না; কিছুক্ষণ পরে আবার চেষ্টা
+      delete msgWatch[peer];
+      msgRetry[peer] = (msgRetry[peer] || 0) + 1;
+      if (msgRetry[peer] <= 3) setTimeout(watchIncomingMessages, 3000);
+    });
+    ref.on("child_removed", snap => { delete incoming[peer][snap.key]; updateBadges(); });
+  }
 }
 
 /* ---------- Settings ---------- */
@@ -605,6 +726,7 @@ $("deleteAcc").onclick = async () => {
     for (const rcv of Object.keys(st)) await db.ref("requests/"+rcv+"/"+uid).remove();
     await db.ref("requests/"+uid).remove();
     await db.ref("sent/"+uid).remove();
+    await db.ref("lastRead/"+uid).remove();
     await db.ref("messages/"+uid).remove();
     await db.ref("calls/"+uid).remove();
     await db.ref("contacts/"+uid).remove();
@@ -616,6 +738,7 @@ $("deleteAcc").onclick = async () => {
     if (me) { watchContacts(); watchMembers(); watchRequests(); watchIncomingCalls(); }
   }
 };
+
 /* ---------- Chat ---------- */
 function openChat(uid) {
   if (!contacts[uid]) return;
@@ -629,9 +752,11 @@ function openChat(uid) {
   show("chat", true);
   $("chat").classList.add("chat-screen");
   loadMessages(uid);
+  markRead(uid);
 }
 
 function closeChat() {
+  if (selected) markRead(selected);
   cleanupMessages();
   show("chat", false);
   $("chat").classList.remove("chat-screen");
@@ -693,6 +818,59 @@ $("sendForm").onsubmit = async e => {
     $("message").value = text;
     say("chatStatus",err(e2));
   }
+};
+
+  
+/* ---------- Mic / Camera permission ---------- */
+async function getMedia(type) {
+  try {
+    return await navigator.mediaDevices.getUserMedia({ audio: true, video: type === "video" });
+  } catch (e) {
+    if (e.name === "NotAllowedError" || e.name === "SecurityError")
+      throw new Error("Mic/Camera permission block করা আছে। Browser-এর address bar-এর lock আইকন → Permissions থেকে Allow করো।");
+    if (e.name === "NotFoundError")
+      throw new Error("Microphone বা Camera পাওয়া যায়নি।");
+    throw e;
+  }
+}
+
+function updatePermBox(ms, cs) {
+  if (ms === "granted" && cs === "granted") { show("permBox", false); return; }
+  show("permBox", true);
+  if (ms === "denied" || cs === "denied") {
+    say("permText", "Mic/Camera block করা আছে। Browser-এর address bar-এর lock আইকন → Permissions → Microphone ও Camera Allow করো, তারপর পেজ রিফ্রেশ দাও।");
+    show("permBtn", false);
+  } else {
+    say("permText", "Call-এর জন্য একবার Mic ও Camera Allow করো। এরপর call করা বা ধরার সময় আর বারবার জিজ্ঞেস করবে না।");
+    show("permBtn", true);
+  }
+}
+
+async function checkPerms() {
+  if (localStorage.getItem("permDone") === "1" && !navigator.permissions) return;
+  try {
+    const m = await navigator.permissions.query({name: "microphone"});
+    const c = await navigator.permissions.query({name: "camera"});
+    const set = () => updatePermBox(m.state, c.state);
+    m.onchange = set; c.onchange = set; set();
+  } catch (e) {
+    // Permissions API না থাকলে (যেমন Safari) একবার দেখাও
+    if (localStorage.getItem("permDone") !== "1") updatePermBox("prompt", "prompt");
+  }
+}
+
+$("permBtn").onclick = async () => {
+  let st = null;
+  try {
+    st = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+  } catch (e) {
+    try { st = await navigator.mediaDevices.getUserMedia({ audio: true }); } // Camera না থাকলে শুধু Mic
+    catch (e2) { say("permText", "Allow হয়নি: " + (e2.message || e2.name)); return; }
+  }
+  st.getTracks().forEach(t => t.stop());
+  localStorage.setItem("permDone", "1");
+  checkPerms();
+  if (!navigator.permissions) show("permBox", false);
 };
 
 /* ---------- WebRTC calls ----------
@@ -780,7 +958,7 @@ async function startCall(type, uid) {
     await endCall(false);
     callType = type;
 
-    const localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === "video" });
+    const localStream = await getMedia(type);
     stream = localStream;
 
     $("localVideo").srcObject = localStream;
@@ -844,7 +1022,7 @@ async function answerCall(id, c) {
     callRole = "callee";
     callType = c.type || "voice";
 
-    const localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: callType === "video" });
+    const localStream = await getMedia(callType);
     stream = localStream;
 
     $("localVideo").srcObject = localStream;
@@ -889,7 +1067,10 @@ async function endCall(writeStatus = true) {
   callRef = null; pc = null; stream = null; callRole = "";
 
   if (writeStatus && ref) {
-    try { await ref.child("status").set("ended"); }
+    try {
+      if (me) await ref.child("endedBy").set(me.uid);
+      await ref.child("status").set("ended");
+    }
     catch (e) { console.warn("Could not update call status:", e); }
   }
   if (ref) {
@@ -914,5 +1095,3 @@ $("endCall").onclick = () => endCall(true);
 </script>
 </body>
 </html>
-
-  
