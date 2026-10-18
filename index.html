@@ -57,6 +57,11 @@ small,.muted{color:#aebac1}
 #chat.chat-screen #chatStatus,#chat.chat-screen #sendForm{flex-shrink:0}
 #chat.chat-screen #message{min-width:0;margin:0}
 
+.chat-bar{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.chat-bar h2{flex:1;min-width:0;margin:0;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-bar button{width:44px;height:44px;padding:0;margin:0;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
+.chat-bar svg{width:22px;height:22px}
+
 /* Call */
 video{width:48%;max-height:240px;background:#202c33}
 #callBox:not(.hidden){position:fixed;inset:0;z-index:2000;margin:0;border-radius:0;overflow:auto}
@@ -90,6 +95,7 @@ video{width:48%;max-height:240px;background:#202c33}
 </section>
 
 <div id="app" class="hidden">
+  
 
 <!-- HOME -->
 <div id="home">
@@ -109,6 +115,7 @@ Video Call</button>
 Add Contact</button>
 </div>
 </div>
+
 <!-- LIST (chat / call / video / add / profile) -->
 <section id="listView" class="hidden">
 <input id="search" placeholder="Search by name or username">
@@ -145,13 +152,17 @@ Add Contact</button>
 
 <!-- CHAT -->
 <section id="chat" class="hidden">
-<div class="row" style="justify-content:space-between">
-<div><h2 id="chatName" style="margin:0">Chat</h2><small id="chatUsername"></small></div>
-<button id="back" class="secondary">Back</button>
-</div>
-<div class="row">
-<button id="voice">☎ Voice Call</button>
-<button id="videoCall">▣ Video Call</button>
+<div class="chat-bar">
+<button id="back" class="secondary" aria-label="Back">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+</button>
+<h2 id="chatName">Chat</h2>
+<button id="voice" aria-label="Voice call">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25c1.1.37 2.3.57 3.6.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1z"/></svg>
+</button>
+<button id="videoCall" aria-label="Video call">
+<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="6" width="13" height="12" rx="3"/><path d="M17 10l5-3.5v11L17 14z"/></svg>
+</button>
 </div>
 <p id="chatStatus"></p>
 <div id="messages"></div>
@@ -216,6 +227,7 @@ let msgRefs = [], callRef = null, pc = null, stream = null;
 let callRole = "", incomingId = null, callType = "voice";
 let inboxRef = null, contactRef = null, membersRef = null;
 let requests = {}, sentReq = {}, reqRef = null, sentRef = null;
+
 // ভিন্ন নেটওয়ার্কে কল চালাতে TURN server লাগতে পারে।
 const rtcConfig = { iceServers: [{urls:"stun:stun.l.google.com:19302"}] };
 
@@ -355,7 +367,7 @@ $("saveUsername").onclick = async () => {
   } catch(e) { say("profileStatus",err(e)); }
   finally { $("saveUsername").disabled = false; }
 };
-
+  
 /* ---------- Contacts & members ---------- */
 function watchContacts() {
   if (!me) return;
@@ -424,6 +436,7 @@ function renderList() {
     box.appendChild(p);
     return;
   }
+
   for (const i of items) {
     const row = document.createElement("div");
     row.className = "item" + (mode === "chat" ? " click" : "");
@@ -603,7 +616,6 @@ $("deleteAcc").onclick = async () => {
     if (me) { watchContacts(); watchMembers(); watchRequests(); watchIncomingCalls(); }
   }
 };
-
 /* ---------- Chat ---------- */
 function openChat(uid) {
   if (!contacts[uid]) return;
@@ -611,7 +623,6 @@ function openChat(uid) {
   selected = uid;
   const c = contacts[uid];
   say("chatName", c.name || uidName[uid] || c.username);
-  say("chatUsername", "@" + (uidName[uid] || c.username));
   say("chatStatus", "");
   $("messages").replaceChildren();
   $("message").value = "";
@@ -634,7 +645,8 @@ function cleanupMessages() {
   msgRefs.forEach(ref => ref.off());
   msgRefs = [];
 }
-  function loadMessages(peer) {
+
+function loadMessages(peer) {
   const all = new Map();
   function render() {
     const box = $("messages");
@@ -871,7 +883,8 @@ async function answerCall(id, c) {
     await endCall(true);
   }
 }
-  async function endCall(writeStatus = true) {
+
+async function endCall(writeStatus = true) {
   const ref = callRef, peer = pc, localStream = stream;
   callRef = null; pc = null; stream = null; callRole = "";
 
@@ -901,3 +914,5 @@ $("endCall").onclick = () => endCall(true);
 </script>
 </body>
 </html>
+
+  
