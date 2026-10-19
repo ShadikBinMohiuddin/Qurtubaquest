@@ -20,12 +20,12 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:#0b141a;color:#e9edef;font:15px Arial}
 header{background:#202c33;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;min-height:58px}
-h1{font-size:21px;margin:0;color:#25d366;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
+h1{font-size:21px;margin:0;color:#f59e0b;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
 main{max-width:900px;margin:auto;padding:12px 12px 100px}
 section,.panel{background:#111b21;border-radius:12px;padding:15px;margin-bottom:12px}
 h2{margin:0 0 10px}
 input{width:100%;padding:12px;margin:5px 0;border:1px solid #35434b;border-radius:7px;background:#202c33;color:white;font-size:15px}
-button{padding:11px 13px;border:0;border-radius:7px;background:#25d366;color:#071b12;font-weight:bold;cursor:pointer;margin:3px;font-size:14px}
+button{padding:11px 13px;border:0;border-radius:7px;background:#f59e0b;color:#231500;font-weight:bold;cursor:pointer;margin:3px;font-size:14px}
 .secondary{background:#35434b;color:white}
 .danger{background:#e74c5b;color:white}
 .hidden{display:none!important}
@@ -39,29 +39,29 @@ small,.muted{color:#aebac1}
 #tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:420px;margin:18px auto}
 .tile{position:relative;aspect-ratio:1;margin:0;border:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:bold;box-shadow:inset 0 3px 8px rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.4)}
 .tile svg{width:30%;height:auto}
-.t1{background:linear-gradient(145deg,#4ade80,#047857);border-radius:55% 45% 48% 52%/60% 52% 48% 40%;color:#fff}
+.t1{background:linear-gradient(145deg,#ffd21f,#f2600a);border-radius:55% 45% 48% 52%/60% 52% 48% 40%;color:#fff}
 .t2{background:linear-gradient(145deg,#38a1ff,#0040d0);border-radius:48% 52% 45% 55%/52% 58% 42% 48%}
 .t3{background:linear-gradient(145deg,#b455ff,#4313c8);border-radius:52% 48% 58% 42%/45% 50% 50% 55%}
 .t4{background:linear-gradient(145deg,#ffd21f,#f2600a);border-radius:45% 55% 52% 48%/55% 45% 55% 45%}
-.t1 svg{color:#15803d}.t2 svg{color:#0050e0}.t3 svg{color:#5b21b6}.t4 svg{color:#d9480f}
+.t1 svg{color:#d9480f}.t2 svg{color:#0050e0}.t3 svg{color:#5b21b6}.t4 svg{color:#d9480f}
 
 /* Lists */
 .item{display:flex;align-items:center;gap:12px;background:#202c33;border-radius:12px;padding:10px 12px;margin:8px 0}
 .item.click{cursor:pointer}
-.av{width:42px;height:42px;border-radius:50%;background:#25d366;color:#071b12;display:grid;place-items:center;font-weight:bold;flex-shrink:0}
+.av{width:42px;height:42px;border-radius:50%;background:#f59e0b;color:#231500;display:grid;place-items:center;font-weight:bold;flex-shrink:0}
 .info{flex:1;min-width:0}
 .info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Bottom bar */
 #nav{position:fixed;left:0;right:0;bottom:0;z-index:500;background:#202c33;display:flex;justify-content:space-between;padding:8px 18px calc(8px + env(safe-area-inset-bottom));border-top:1px solid #35434b}
 #nav button{position:relative;background:none;color:#aebac1;margin:0;padding:8px 16px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px}
-#nav button.on{color:#25d366}
+#nav button.on{color:#f59e0b}
 #nav svg{width:28px;height:28px}
 .tile .badge{top:14%;right:14%;min-width:26px;height:26px;font-size:14px;box-shadow:0 0 0 3px #0b141a}
 .badge.pill{position:static;display:inline-grid;flex-shrink:0;margin-right:2px}
-.item.unread{border-left:4px solid #25d366}
+.item.unread{border-left:4px solid #f59e0b}
 .info small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.info small.unread-text{color:#25d366}
+.info small.unread-text{color:#f59e0b}
 .info small.missed{color:#ff6b78}
 .badge{position:absolute;top:0;right:4px;background:#e74c5b;color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:11px;display:grid;place-items:center;padding:0 5px}
 
@@ -72,7 +72,7 @@ small,.muted{color:#aebac1}
 /* Chat */
 #messages{height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:8px;background:#0b141a;border-radius:8px}
 .msg{max-width:85%;background:#202c33;border-radius:9px;padding:10px;overflow-wrap:anywhere;white-space:pre-wrap}
-.mine{align-self:flex-end;background:#005c4b}
+.mine{align-self:flex-end;background:#8a4b08}
 #chat.chat-screen{position:fixed;inset:0;z-index:1000;width:100%;max-width:none;height:100vh;height:100dvh;margin:0;border-radius:0;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;overflow:hidden}
 #chat.chat-screen #messages{flex:1;height:auto;min-height:0;overflow-y:auto}
 #chat.chat-screen #chatStatus,#chat.chat-screen #sendForm{flex-shrink:0}
@@ -104,7 +104,7 @@ video{width:48%;max-height:240px;background:#202c33}
 <button id="login" style="flex:1">Login</button>
 <button id="signup" style="flex:1">Sign up</button>
 </div>
-<button id="forgot" style="background:none;color:#25d366;width:100%;margin:6px 0 0;text-decoration:underline">Forgot password?</button>
+<button id="forgot" style="background:none;color:#f59e0b;width:100%;margin:6px 0 0;text-decoration:underline">Forgot password?</button>
 <p id="status"></p>
 </section>
 
@@ -204,7 +204,6 @@ Add Contact</button>
 <p id="delStatus"></p>
 </section>
 </div>
-
 <!-- CHAT -->
 <section id="chat" class="hidden">
 <div class="chat-bar">
@@ -552,8 +551,7 @@ function renderList() {
     box.appendChild(p);
     return;
   }
-
-  for (const i of items) {
+for (const i of items) {
     const row = document.createElement("div");
     row.className = "item" + (["chat", "profile", "call", "video"].includes(mode) ? " click" : "");
     const av = document.createElement("div");
@@ -638,7 +636,8 @@ function watchRequests() {
     renderList(); applySentNames();
   }, e => say("listStatus", err(e)));
 }
-  // অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
+
+// অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
 function applySentNames() {
   if (!me) return;
   for (const [uid, v] of Object.entries(sentReq)) {
@@ -1013,7 +1012,6 @@ function notifyIncoming(name) {
       new Notification("Qurtuba Quest", { body: name + " is calling you", tag: "incoming-call" });
   } catch (e) {}
 }
-
 /* ---------- WebRTC calls ----------
    Call path: calls/{receiverUid}/{callId}
    দুজনকেই একে অপরকে contact হিসেবে save করতে হবে। */
