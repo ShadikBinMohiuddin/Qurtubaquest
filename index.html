@@ -15,17 +15,17 @@
 <meta property="og:site_name" content="Qurtuba Quest">
 <meta property="og:title" content="Qurtuba Quest – Chat, Voice Call &amp; Video Call App">
 <meta property="og:description" content="Add friends, send messages and make voice and video calls from your browser.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b141a'/><path d='M12 38C12 20 28 12 42 14c8 2 8 14 4 26-2 6-10 8-20 8-9 0-14-4-14-10z' fill='%2322c55e'/><path d='M58 14c20-2 32 10 30 28-1 8-12 10-22 8-8-2-12-8-10-18 1-8 0-16 2-18z' fill='%231d6ff2'/><path d='M14 56c2-8 14-10 24-6 8 3 8 12 6 22-2 10-12 18-24 14C8 82 10 66 14 56z' fill='%237c3aed'/><path d='M58 58c6-6 18-6 26 0 6 6 4 20-6 28-12 8-26 4-26-8 0-8 2-14 6-20z' fill='%23f59e0b'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b141a'/><path d='M12 38C12 20 28 12 42 14c8 2 8 14 4 26-2 6-10 8-20 8-9 0-14-4-14-10z' fill='%2322c55e'/><path d='M58 14c20-2 32 10 30 28-1 8-12 10-22 8-8-2-12-8-10-18 1-8 0-16 2-18z' fill='%231d6ff2'/><path d='M14 56c2-8 14-10 24-6 8 3 8 12 6 22-2 10-12 18-24 14C8 82 10 66 14 56z' fill='%237c3aed'/><path d='M58 58c6-6 18-6 26 0 6 6 4 20-6 28-12 8-26 4-26-8 0-8 2-14 6-20z' fill='%23f2600a'/></svg>">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:#0b141a;color:#e9edef;font:15px Arial}
 header{background:#202c33;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;min-height:58px}
-h1{font-size:21px;margin:0;color:#f59e0b;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
+h1{font-size:21px;margin:0;color:#a78bfa;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
 main{max-width:900px;margin:auto;padding:12px 12px 100px}
 section,.panel{background:#111b21;border-radius:12px;padding:15px;margin-bottom:12px}
 h2{margin:0 0 10px}
 input{width:100%;padding:12px;margin:5px 0;border:1px solid #35434b;border-radius:7px;background:#202c33;color:white;font-size:15px}
-button{padding:11px 13px;border:0;border-radius:7px;background:#f59e0b;color:#231500;font-weight:bold;cursor:pointer;margin:3px;font-size:14px}
+button{padding:11px 13px;border:0;border-radius:7px;background:#7c3aed;color:#fff;font-weight:bold;cursor:pointer;margin:3px;font-size:14px}
 .secondary{background:#35434b;color:white}
 .danger{background:#e74c5b;color:white}
 .hidden{display:none!important}
@@ -39,29 +39,29 @@ small,.muted{color:#aebac1}
 #tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:420px;margin:18px auto}
 .tile{position:relative;aspect-ratio:1;margin:0;border:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:bold;box-shadow:inset 0 3px 8px rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.4)}
 .tile svg{width:30%;height:auto}
-.t1{background:linear-gradient(145deg,#ffd21f,#f2600a);border-radius:55% 45% 48% 52%/60% 52% 48% 40%;color:#fff}
+.t1{background:linear-gradient(145deg,#ffa51f,#f2600a);border-radius:55% 45% 48% 52%/60% 52% 48% 40%;color:#fff}
 .t2{background:linear-gradient(145deg,#38a1ff,#0040d0);border-radius:48% 52% 45% 55%/52% 58% 42% 48%}
-.t3{background:linear-gradient(145deg,#b455ff,#4313c8);border-radius:52% 48% 58% 42%/45% 50% 50% 55%}
-.t4{background:linear-gradient(145deg,#ffd21f,#f2600a);border-radius:45% 55% 52% 48%/55% 45% 55% 45%}
-.t1 svg{color:#d9480f}.t2 svg{color:#0050e0}.t3 svg{color:#5b21b6}.t4 svg{color:#d9480f}
+.t3{background:linear-gradient(145deg,#ffa51f,#f2600a);border-radius:52% 48% 58% 42%/45% 50% 50% 55%}
+.t4{background:linear-gradient(145deg,#4ade80,#047857);border-radius:45% 55% 52% 48%/55% 45% 55% 45%}
+.t1 svg{color:#d9480f}.t2 svg{color:#0050e0}.t3 svg{color:#d9480f}.t4 svg{color:#15803d}
 
 /* Lists */
 .item{display:flex;align-items:center;gap:12px;background:#202c33;border-radius:12px;padding:10px 12px;margin:8px 0}
 .item.click{cursor:pointer}
-.av{width:42px;height:42px;border-radius:50%;background:#f59e0b;color:#231500;display:grid;place-items:center;font-weight:bold;flex-shrink:0}
+.av{width:42px;height:42px;border-radius:50%;background:#7c3aed;color:#fff;display:grid;place-items:center;font-weight:bold;flex-shrink:0}
 .info{flex:1;min-width:0}
 .info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Bottom bar */
 #nav{position:fixed;left:0;right:0;bottom:0;z-index:500;background:#202c33;display:flex;justify-content:space-between;padding:8px 18px calc(8px + env(safe-area-inset-bottom));border-top:1px solid #35434b}
 #nav button{position:relative;background:none;color:#aebac1;margin:0;padding:8px 16px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px}
-#nav button.on{color:#f59e0b}
+#nav button.on{color:#a78bfa}
 #nav svg{width:28px;height:28px}
 .tile .badge{top:14%;right:14%;min-width:26px;height:26px;font-size:14px;box-shadow:0 0 0 3px #0b141a}
 .badge.pill{position:static;display:inline-grid;flex-shrink:0;margin-right:2px}
-.item.unread{border-left:4px solid #f59e0b}
+.item.unread{border-left:4px solid #a78bfa}
 .info small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.info small.unread-text{color:#f59e0b}
+.info small.unread-text{color:#a78bfa}
 .info small.missed{color:#ff6b78}
 .badge{position:absolute;top:0;right:4px;background:#e74c5b;color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:11px;display:grid;place-items:center;padding:0 5px}
 
@@ -72,7 +72,7 @@ small,.muted{color:#aebac1}
 /* Chat */
 #messages{height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:8px;background:#0b141a;border-radius:8px}
 .msg{max-width:85%;background:#202c33;border-radius:9px;padding:10px;overflow-wrap:anywhere;white-space:pre-wrap}
-.mine{align-self:flex-end;background:#8a4b08}
+.mine{align-self:flex-end;background:#5b3bb5}
 #chat.chat-screen{position:fixed;inset:0;z-index:1000;width:100%;max-width:none;height:100vh;height:100dvh;margin:0;border-radius:0;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;overflow:hidden}
 #chat.chat-screen #messages{flex:1;height:auto;min-height:0;overflow-y:auto}
 #chat.chat-screen #chatStatus,#chat.chat-screen #sendForm{flex-shrink:0}
@@ -104,7 +104,7 @@ video{width:48%;max-height:240px;background:#202c33}
 <button id="login" style="flex:1">Login</button>
 <button id="signup" style="flex:1">Sign up</button>
 </div>
-<button id="forgot" style="background:none;color:#f59e0b;width:100%;margin:6px 0 0;text-decoration:underline">Forgot password?</button>
+<button id="forgot" style="background:none;color:#a78bfa;width:100%;margin:6px 0 0;text-decoration:underline">Forgot password?</button>
 <p id="status"></p>
 </section>
 
@@ -204,6 +204,7 @@ Add Contact</button>
 <p id="delStatus"></p>
 </section>
 </div>
+
 <!-- CHAT -->
 <section id="chat" class="hidden">
 <div class="chat-bar">
@@ -293,6 +294,7 @@ function dispName(uid) {
 let lastRead = {}, incoming = {}, inboxCalls = {}, msgWatch = {}, msgRetry = {}, lastMsg = {};
 let lastReadRef = null, callStatRef = null;
 
+  
 // ভিন্ন নেটওয়ার্কে কল চালাতে TURN server লাগতে পারে।
 const rtcConfig = { iceServers: [{urls:"stun:stun.l.google.com:19302"}] };
 
@@ -551,7 +553,8 @@ function renderList() {
     box.appendChild(p);
     return;
   }
-for (const i of items) {
+
+  for (const i of items) {
     const row = document.createElement("div");
     row.className = "item" + (["chat", "profile", "call", "video"].includes(mode) ? " click" : "");
     const av = document.createElement("div");
@@ -614,8 +617,7 @@ for (const i of items) {
     box.appendChild(row);
   }
 }
-
-function updateBadge() {
+  function updateBadge() {
   const n = Object.keys(requests).length;
   $("reqBadge").textContent = n;
   show("reqBadge", n > 0);
@@ -857,8 +859,7 @@ $("deleteAcc").onclick = async () => {
     if (me) { watchContacts(); watchMembers(); watchProfiles(); watchRequests(); watchIncomingCalls(); }
   }
 };
-
-$("saveFull").onclick = async () => {
+  $("saveFull").onclick = async () => {
   const n = $("newFull").value.trim().replace(/\s+/g, " ");
   if (!n || n.length > 40) { say("fullStatus", "Full name must be 1–40 characters."); return; }
   try {
@@ -1012,6 +1013,7 @@ function notifyIncoming(name) {
       new Notification("Qurtuba Quest", { body: name + " is calling you", tag: "incoming-call" });
   } catch (e) {}
 }
+
 /* ---------- WebRTC calls ----------
    Call path: calls/{receiverUid}/{callId}
    দুজনকেই একে অপরকে contact হিসেবে save করতে হবে। */
@@ -1139,8 +1141,7 @@ async function startCall(type, uid) {
         say("callStatus", "Could not connect: " + err(e));
       }
     });
-
-    ref.child("status").on("value", snap => {
+ref.child("status").on("value", snap => {
       if (callRef !== ref) return;
       if (["ended", "rejected"].includes(snap.val())) endCall(false);
       else if (snap.val() === "active") { stopRing(); say("callStatus", "Call answered. Connecting…"); }
