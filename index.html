@@ -549,9 +549,10 @@ function renderList() {
     box.appendChild(p);
     return;
   }
+
   for (const i of items) {
     const row = document.createElement("div");
-    row.className = "item" + (mode === "chat" ? " click" : "");
+    row.className = "item" + (["chat", "profile", "call", "video"].includes(mode) ? " click" : "");
     const av = document.createElement("div");
     av.className = "av"; av.textContent = (i.name[0] || "?").toUpperCase();
     const info = document.createElement("div");
@@ -582,8 +583,10 @@ function renderList() {
       row.onclick = () => openChat(i.uid);
       row.appendChild(button("Chat", "", () => openChat(i.uid)));
     } else if (mode === "call") {
+      row.onclick = () => openChat(i.uid);
       row.appendChild(button("☎ Call", "", () => startCall("voice", i.uid)));
     } else if (mode === "video") {
+      row.onclick = () => openChat(i.uid);
       row.appendChild(button("▣ Video", "", () => startCall("video", i.uid)));
     } else if (mode === "requests") {
       row.appendChild(button("Accept", "", () => acceptRequest(i.uid)));
@@ -598,6 +601,7 @@ function renderList() {
         row.appendChild(button("Cancel request", "secondary", () => cancelRequest(i.uid)));
       } else row.appendChild(button("＋ Request", "", () => sendRequest(i.uid, i.username)));
     } else if (mode === "profile") {
+      row.onclick = () => openChat(i.uid);
       row.appendChild(button("Remove", "danger", async () => {
         if (!confirm("Remove " + i.name + " from contacts?")) return;
         try {
@@ -631,8 +635,7 @@ function watchRequests() {
     renderList(); applySentNames();
   }, e => say("listStatus", err(e)));
 }
-
-// অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
+  // অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
 function applySentNames() {
   if (!me) return;
   for (const [uid, v] of Object.entries(sentReq)) {
@@ -852,7 +855,7 @@ $("deleteAcc").onclick = async () => {
     if (me) { watchContacts(); watchMembers(); watchProfiles(); watchRequests(); watchIncomingCalls(); }
   }
 };
-
+  
 $("saveFull").onclick = async () => {
   const n = $("newFull").value.trim().replace(/\s+/g, " ");
   if (!n || n.length > 40) { say("fullStatus", "Full name must be 1–40 characters."); return; }
@@ -993,6 +996,7 @@ function startRing(kind) {
     }
   }
 }
+
 function stopRing() {
   clearInterval(ringTimer); clearInterval(vibTimer);
   ringTimer = vibTimer = null;
@@ -1123,8 +1127,8 @@ async function startCall(type, uid) {
       offer: { type: offer.type, sdp: offer.sdp },
       status: "ringing", createdAt: TS
     });
-
-    ref.child("answer").on("value", async snap => {
+    
+ref.child("answer").on("value", async snap => {
       if (!snap.val() || pc !== peer || peer.remoteDescription) return;
       try {
         await peer.setRemoteDescription(new RTCSessionDescription(snap.val()));
