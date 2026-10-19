@@ -39,11 +39,11 @@ small,.muted{color:#aebac1}
 #tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:420px;margin:18px auto}
 .tile{position:relative;aspect-ratio:1;margin:0;border:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:bold;box-shadow:inset 0 3px 8px rgba(255,255,255,.28),0 6px 16px rgba(0,0,0,.4)}
 .tile svg{width:30%;height:auto}
-.t1{background:linear-gradient(145deg,#ffa51f,#f2600a);border-radius:55% 45% 48% 52%/60% 52% 48% 40%;color:#fff}
+.t1{background:#0F172A;border-radius:55% 45% 48% 52%/60% 52% 48% 40%;color:#fff}
 .t2{background:linear-gradient(145deg,#38a1ff,#0040d0);border-radius:48% 52% 45% 55%/52% 58% 42% 48%}
 .t3{background:linear-gradient(145deg,#ffa51f,#f2600a);border-radius:52% 48% 58% 42%/45% 50% 50% 55%}
 .t4{background:linear-gradient(145deg,#4ade80,#047857);border-radius:45% 55% 52% 48%/55% 45% 55% 45%}
-.t1 svg{color:#d9480f}.t2 svg{color:#0050e0}.t3 svg{color:#d9480f}.t4 svg{color:#15803d}
+.t1 svg{color:#0F172A}.t2 svg{color:#0050e0}.t3 svg{color:#d9480f}.t4 svg{color:#15803d}
 
 /* Lists */
 .item{display:flex;align-items:center;gap:12px;background:#202c33;border-radius:12px;padding:10px 12px;margin:8px 0}
@@ -226,7 +226,6 @@ Add Contact</button>
 <button>Send</button>
 </form>
 </section>
-
 <!-- CALL -->
 <section id="callBox" class="hidden">
 <h2 id="callTitle">Call</h2>
@@ -294,7 +293,6 @@ function dispName(uid) {
 let lastRead = {}, incoming = {}, inboxCalls = {}, msgWatch = {}, msgRetry = {}, lastMsg = {};
 let lastReadRef = null, callStatRef = null;
 
-  
 // ভিন্ন নেটওয়ার্কে কল চালাতে TURN server লাগতে পারে।
 const rtcConfig = { iceServers: [{urls:"stun:stun.l.google.com:19302"}] };
 
@@ -553,8 +551,7 @@ function renderList() {
     box.appendChild(p);
     return;
   }
-
-  for (const i of items) {
+for (const i of items) {
     const row = document.createElement("div");
     row.className = "item" + (["chat", "profile", "call", "video"].includes(mode) ? " click" : "");
     const av = document.createElement("div");
@@ -617,7 +614,8 @@ function renderList() {
     box.appendChild(row);
   }
 }
-  function updateBadge() {
+
+function updateBadge() {
   const n = Object.keys(requests).length;
   $("reqBadge").textContent = n;
   show("reqBadge", n > 0);
@@ -859,7 +857,8 @@ $("deleteAcc").onclick = async () => {
     if (me) { watchContacts(); watchMembers(); watchProfiles(); watchRequests(); watchIncomingCalls(); }
   }
 };
-  $("saveFull").onclick = async () => {
+
+$("saveFull").onclick = async () => {
   const n = $("newFull").value.trim().replace(/\s+/g, " ");
   if (!n || n.length > 40) { say("fullStatus", "Full name must be 1–40 characters."); return; }
   try {
@@ -886,8 +885,7 @@ function openChat(uid) {
   loadMessages(uid);
   markRead(uid);
 }
-
-function closeChat() {
+  function closeChat() {
   if (selected) markRead(selected);
   cleanupMessages();
   show("chat", false);
@@ -1141,7 +1139,8 @@ async function startCall(type, uid) {
         say("callStatus", "Could not connect: " + err(e));
       }
     });
-ref.child("status").on("value", snap => {
+
+    ref.child("status").on("value", snap => {
       if (callRef !== ref) return;
       if (["ended", "rejected"].includes(snap.val())) endCall(false);
       else if (snap.val() === "active") { stopRing(); say("callStatus", "Call answered. Connecting…"); }
