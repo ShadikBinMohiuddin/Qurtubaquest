@@ -3,18 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QurtubaZone– Chat, Voice Call &amp; Video Call App</title>
-<meta name="description" content="Vynqora is a free messaging app. Sign up, add friends, send messages and make voice and video calls right from your browser.">
-<meta name="keywords" content="Vynqora, chat app, messaging app, voice call, video call, free chat">
+<title>Qurtuba Quest – Chat, Voice Call &amp; Video Call App</title>
+<meta name="description" content="Qurtuba Quest is a free messaging app. Sign up, add friends, send messages and make voice and video calls right from your browser.">
+<meta name="keywords" content="Qurtuba Quest, chat app, messaging app, voice call, video call, free chat">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#0b141a">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Vynqora">
-<meta property="og:title" content="Vynqora – Chat, Voice Call &amp; Video Call App">
+<meta property="og:site_name" content="Qurtuba Quest">
+<meta property="og:title" content="Qurtuba Quest – Chat, Voice Call &amp; Video Call App">
 <meta property="og:description" content="Add friends, send messages and make voice and video calls from your browser.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b141a'/><path d='M12 38C12 20 28 12 42 14c8 2 8 14 4 26-2 6-10 8-20 8-9 0-14-4-14-10z' fill='%2322c55e'/><path d='M58 14c20-2 32 10 30 28-1 8-12 10-22 8-8-2-12-8-10-18 1-8 0-16 2-18z' fill='%231d6ff2'/><path d='M14 56c2-8 14-10 24-6 8 3 8 12 6 22-2 10-12 18-24 14C8 82 10 66 14 56z' fill='%237c3aed'/><path d='M58 58c6-6 18-6 26 0 6 6 4 20-6 28-12 8-26 4-26-8 0-8 2-14 6-20z' fill='%23f59e0b'/></svg>">
-<meta name="google-site-verification" content="jccegBN6K0SGNxQyzkGVW6xcsy90ZLBRSgWkYixHpU8" />
-  <style>
+<style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:#0b141a;color:#e9edef;font:15px Arial}
 header{background:#202c33;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;min-height:58px}
@@ -89,12 +88,12 @@ video{width:48%;max-height:240px;background:#202c33}
 <body>
 <header>
 <button id="backBtn" class="secondary hidden" style="margin:0">←</button>
-<h1 id="title">☾ QurtubZone</h1>
+<h1 id="title">☾ Qurtuba Quest</h1>
 </header>
 
 <main>
 <section id="auth">
-<h2>Welcome to QurtubaZone</h2>
+<h2>Welcome to Qurtuba Quest</h2>
 <p class="muted">Chat, voice call and video call with your friends. Create a free account to get started.</p>
 <input id="email" type="email" placeholder="Email address" autocomplete="email">
 <input id="password" type="password" placeholder="Password (minimum 6 characters)">
@@ -304,8 +303,9 @@ function err(e) {
     ? "Firebase Rules permission denied. Check your Database Rules."
     : (e.message || "Something went wrong.");
 }
+
 /* ---------- Navigation ---------- */
-const TITLES = {home:"☾ Vynqora", chat:"Messages", call:"Voice Call", video:"Video Call",
+const TITLES = {home:"☾ Qurtuba Quest", chat:"Messages", call:"Voice Call", video:"Video Call",
   add:"Add Contact", profile:"My Contacts", requests:"Friend Requests", settings:"Settings",
   setName:"Change Username", setPass:"Change Password", setDelete:"Delete Account", setFull:"Change Full Name"};
 const SETTINGS_GROUP = ["settings","setFull","setName","setPass","setDelete"];
@@ -549,7 +549,6 @@ function renderList() {
     box.appendChild(p);
     return;
   }
-
   for (const i of items) {
     const row = document.createElement("div");
     row.className = "item" + (mode === "chat" ? " click" : "");
@@ -681,6 +680,7 @@ async function rejectRequest(uid) {
     await db.ref("sent/" + uid + "/" + me.uid).remove();
   } catch(e) { say("listStatus", err(e)); }
 }
+
 /* ---------- Unread messages & missed calls ---------- */
 function lr(k) { return lastRead[k] || 0; }
 
@@ -993,7 +993,6 @@ function startRing(kind) {
     }
   }
 }
-
 function stopRing() {
   clearInterval(ringTimer); clearInterval(vibTimer);
   ringTimer = vibTimer = null;
@@ -1004,7 +1003,7 @@ function stopRing() {
 function notifyIncoming(name) {
   try {
     if (document.hidden && "Notification" in window && Notification.permission === "granted")
-      new Notification("Vynqora", { body: name + " is calling you", tag: "incoming-call" });
+      new Notification("Qurtuba Quest", { body: name + " is calling you", tag: "incoming-call" });
   } catch (e) {}
 }
 
@@ -1135,6 +1134,7 @@ async function startCall(type, uid) {
         say("callStatus", "Could not connect: " + err(e));
       }
     });
+
     ref.child("status").on("value", snap => {
       if (callRef !== ref) return;
       if (["ended", "rejected"].includes(snap.val())) endCall(false);
