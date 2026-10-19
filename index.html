@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="google-site-verification" content="jccegBN6K0SGNxQyzkGVW6xcsy90ZLBRSgWkYixHpU8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Qurtuba Quest – Chat, Voice Call &amp; Video Call App</title>
 <meta name="description" content="Qurtuba Quest is a free messaging app. Sign up, add friends, send messages and make voice and video calls right from your browser.">
@@ -580,7 +581,8 @@ function renderList() {
       pb.className = "badge pill"; pb.textContent = cnt > 99 ? "99+" : cnt;
       row.appendChild(pb);
     }
-        if (mode === "chat") {
+
+    if (mode === "chat") {
       row.onclick = () => openChat(i.uid);
       row.appendChild(button("Chat", "", () => openChat(i.uid)));
     } else if (mode === "call") {
@@ -636,8 +638,7 @@ function watchRequests() {
     renderList(); applySentNames();
   }, e => say("listStatus", err(e)));
 }
-
-// অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
+  // অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
 function applySentNames() {
   if (!me) return;
   for (const [uid, v] of Object.entries(sentReq)) {
@@ -933,7 +934,7 @@ function loadMessages(peer) {
     ref.on("child_removed",snap => { all.delete(from+":"+snap.key); render(); });
   });
 }
-  
+
 $("sendForm").onsubmit = async e => {
   e.preventDefault();
   if (!me || !selected || !contacts[selected]) return;
@@ -1245,4 +1246,3 @@ $("endCall").onclick = () => endCall(true);
 </script>
 </body>
 </html>
-
