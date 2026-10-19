@@ -7,6 +7,8 @@
 <meta name="description" content="Qurtuba Quest is a free messaging app. Sign up, add friends, send messages and make voice and video calls right from your browser.">
 <meta name="keywords" content="Qurtuba Quest, chat app, messaging app, voice call, video call, free chat">
 <meta name="robots" content="index, follow">
+<link rel="canonical" href="https://qurtubaquest.vercel.app/">
+<meta property="og:url" content="https://qurtubaquest.vercel.app/">
 <meta name="theme-color" content="#0b141a">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Qurtuba Quest">
@@ -369,12 +371,12 @@ $("forgot").onclick = async () => {
   if (!email) { say("status", "আগে উপরে Email address লিখো, তারপর Forgot password চাপো।"); return; }
   try {
     await auth.sendPasswordResetEmail(email);
-    say("status", "Password reset link পাঠানো হয়েছে। Inbox এবং Spam folder দেখো।");
+    say("status", "Reset link পাঠানো হয়েছে (" + email + ")। Sign up-এর সময়কার একই Email হলে Inbox, Spam ও Promotions folder দেখো; আসতে কয়েক মিনিট লাগতে পারে।");
   } catch (e) {
     if (e.code === "auth/invalid-email") say("status", "Email address সঠিক নয়।");
     else if (e.code === "auth/user-not-found") say("status", "এই Email দিয়ে কোনো Account নেই।");
     else if (e.code === "auth/too-many-requests") say("status", "অনেকবার চেষ্টা হয়েছে। একটু পরে আবার চেষ্টা করো।");
-    else say("status", err(e));
+    else say("status", err(e) + (e.code ? " [" + e.code + "]" : ""));
   }
 };
 
@@ -578,8 +580,7 @@ function renderList() {
       pb.className = "badge pill"; pb.textContent = cnt > 99 ? "99+" : cnt;
       row.appendChild(pb);
     }
-
-    if (mode === "chat") {
+        if (mode === "chat") {
       row.onclick = () => openChat(i.uid);
       row.appendChild(button("Chat", "", () => openChat(i.uid)));
     } else if (mode === "call") {
@@ -635,7 +636,8 @@ function watchRequests() {
     renderList(); applySentNames();
   }, e => say("listStatus", err(e)));
 }
-  // অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
+
+// অপর পক্ষ accept করলে, request পাঠানোর সময় দেওয়া নামটা contact-এ বসাও
 function applySentNames() {
   if (!me) return;
   for (const [uid, v] of Object.entries(sentReq)) {
@@ -855,7 +857,7 @@ $("deleteAcc").onclick = async () => {
     if (me) { watchContacts(); watchMembers(); watchProfiles(); watchRequests(); watchIncomingCalls(); }
   }
 };
-  
+
 $("saveFull").onclick = async () => {
   const n = $("newFull").value.trim().replace(/\s+/g, " ");
   if (!n || n.length > 40) { say("fullStatus", "Full name must be 1–40 characters."); return; }
@@ -931,7 +933,7 @@ function loadMessages(peer) {
     ref.on("child_removed",snap => { all.delete(from+":"+snap.key); render(); });
   });
 }
-
+  
 $("sendForm").onsubmit = async e => {
   e.preventDefault();
   if (!me || !selected || !contacts[selected]) return;
@@ -1127,8 +1129,8 @@ async function startCall(type, uid) {
       offer: { type: offer.type, sdp: offer.sdp },
       status: "ringing", createdAt: TS
     });
-    
-ref.child("answer").on("value", async snap => {
+
+    ref.child("answer").on("value", async snap => {
       if (!snap.val() || pc !== peer || peer.remoteDescription) return;
       try {
         await peer.setRemoteDescription(new RTCSessionDescription(snap.val()));
@@ -1243,3 +1245,4 @@ $("endCall").onclick = () => endCall(true);
 </script>
 </body>
 </html>
+
